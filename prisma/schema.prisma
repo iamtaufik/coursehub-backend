@@ -9,3 +9,86 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Roles {
+  admin
+  user
+}
+
+enum Levels {
+  beginners
+  intermediate
+  advanced
+}
+
+// model users
+model Users {
+  id        Int       @id @default(autoincrement())
+  nickname  String
+  email     String    @unique
+  password  String
+  role      Roles     @default(user)
+  courses   Courses[]
+  profile   Profiles?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// model profiles
+model Profiles {
+  id              Int     @id @default(autoincrement())
+  users_id        Int     @unique
+  first_name      String?
+  last_name       String?
+  profile_picture String?
+  city            String?
+  coutry          String?
+  users           Users   @relation(fields: [users_id], references: [id])
+}
+
+// model Categories
+model Categories {
+  id              Int       @id @default(autoincrement())
+  name_categories String
+  courses         Courses[]
+}
+
+// model Courses
+model Courses {
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String
+  image        String?
+  requirements String[]
+  level        Levels     @default(beginners)
+  price        Int
+  ratings      Int
+  author       String
+  chapter_id   Int
+  chapters     Chapters[]
+  category_id  Int
+  category     Categories @relation(fields: [category_id], references: [id])
+  users_id     Int
+  users        Users      @relation(fields: [users_id], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Chapters {
+  id        Int       @id @default(autoincrement())
+  name      String
+  course_id Int
+  courses   Courses   @relation(fields: [course_id], references: [id])
+  modules   Modules[]
+}
+
+model Modules {
+  id         Int      @id @default(autoincrement())
+  title      String
+  duration   Int
+  url        String
+  chapter_id Int
+  chapters   Chapters @relation(fields: [chapter_id], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
