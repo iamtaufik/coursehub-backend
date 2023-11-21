@@ -9,3 +9,80 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// model users
+model Users {
+  ID       Int        @id @default(autoincrement())
+  nickname String
+  email    String     @unique
+  password String
+  role     Roles
+  course   Courses[]
+  profile  Profiles[]
+}
+
+enum Roles {
+  admin
+  user
+}
+
+// model profiles
+model Profiles {
+  ID              Int    @id @default(autoincrement())
+  users_id        Int    @unique
+  first_name      String
+  last_name       String
+  profile_picture String
+  city            String
+  coutry          String
+  Users           Users  @relation(fields: [users_id], references: [ID])
+}
+
+// model Categories
+model Categories {
+  ID              Int       @id @default(autoincrement())
+  name_categories String
+  Courses         Courses[]
+}
+
+// model Courses
+model Courses {
+  ID          Int        @id @default(autoincrement())
+  title       String
+  description String
+  level       Levels
+  price       Int
+  ratings     Int
+  chapter_id  Int
+  chapter     Chapters   @relation(fields: [chapter_id], references: [ID])
+  category_id Int
+  category    Categories @relation(fields: [category_id], references: [ID])
+  users       Users?     @relation(fields: [users_id], references: [ID])
+  users_id    Int
+  Modules     Modules[]
+}
+
+enum Levels {
+  beginners
+  intermediate
+  advanced
+}
+
+model Chapters {
+  ID           Int       @id @default(autoincrement())
+  name_chapter String
+  module_id    Int
+  module       Modules   @relation(fields: [modulesID], references: [ID])
+  Courses      Courses[]
+  modulesID    Int
+}
+
+model Modules {
+  ID        Int        @id @default(autoincrement())
+  title     String
+  duration  Int
+  url       String
+  course_id Int
+  course    Courses    @relation(fields: [course_id], references: [ID])
+  Chapters  Chapters[]
+}
