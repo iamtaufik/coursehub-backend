@@ -1,7 +1,7 @@
 # CourseHub - Backend
 # How to Use
 ## Initial Project
-1. Silahkan clone repo ini `git clone ...`
+1. Silahkan clone repo ini `git clone https://github.com/iamtaufik/coursehub-backend.git`
 2. Masuk ke folder projek `cd coursehub-backend`
 3. Buat `.env` file pada projek, contoh isinya ada di file `.env.example`
 4. Install semua dependency dengan `npm install`
