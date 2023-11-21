@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,56 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model users
-model Users {
-  ID       Int        @id @default(autoincrement())
-  nickname String
-  email    String     @unique
-  password String
-  role     Roles
-  course   Courses[]
-  profile  Profiles[]
-}
-
 enum Roles {
   admin
   user
-}
-
-// model profiles
-model Profiles {
-  ID              Int    @id @default(autoincrement())
-  users_id        Int    @unique
-  first_name      String
-  last_name       String
-  profile_picture String
-  city            String
-  coutry          String
-  Users           Users  @relation(fields: [users_id], references: [ID])
-}
-
-// model Categories
-model Categories {
-  ID              Int       @id @default(autoincrement())
-  name_categories String
-  Courses         Courses[]
-}
-
-// model Courses
-model Courses {
-  ID          Int        @id @default(autoincrement())
-  title       String
-  description String
-  level       Levels
-  price       Int
-  ratings     Int
-  chapter_id  Int
-  chapter     Chapters   @relation(fields: [chapter_id], references: [ID])
-  category_id Int
-  category    Categories @relation(fields: [category_id], references: [ID])
-  users       Users?     @relation(fields: [users_id], references: [ID])
-  users_id    Int
-  Modules     Modules[]
 }
 
 enum Levels {
@@ -68,21 +18,74 @@ enum Levels {
   advanced
 }
 
+// model users
+model Users {
+  id        Int       @id @default(autoincrement())
+  nickname  String
+  email     String    @unique
+  password  String
+  role      Roles     @default(user)
+  courses   Courses[]
+  profile   Profiles?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// model profiles
+model Profiles {
+  id              Int     @id @default(autoincrement())
+  users_id        Int     @unique
+  first_name      String?
+  last_name       String?
+  profile_picture String?
+  city            String?
+  coutry          String?
+  users           Users   @relation(fields: [users_id], references: [id])
+}
+
+// model Categories
+model Categories {
+  id              Int       @id @default(autoincrement())
+  name_categories String
+  courses         Courses[]
+}
+
+// model Courses
+model Courses {
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String
+  image        String?
+  requirements String[]
+  level        Levels     @default(beginners)
+  price        Int
+  ratings      Int
+  author       String
+  chapter_id   Int
+  chapters     Chapters[]
+  category_id  Int
+  category     Categories @relation(fields: [category_id], references: [id])
+  users_id     Int
+  users        Users      @relation(fields: [users_id], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
 model Chapters {
-  ID           Int       @id @default(autoincrement())
-  name_chapter String
-  module_id    Int
-  module       Modules   @relation(fields: [modulesID], references: [ID])
-  Courses      Courses[]
-  modulesID    Int
+  id        Int       @id @default(autoincrement())
+  name      String
+  course_id Int
+  courses   Courses   @relation(fields: [course_id], references: [id])
+  modules   Modules[]
 }
 
 model Modules {
-  ID        Int        @id @default(autoincrement())
-  title     String
-  duration  Int
-  url       String
-  course_id Int
-  course    Courses    @relation(fields: [course_id], references: [ID])
-  Chapters  Chapters[]
+  id         Int      @id @default(autoincrement())
+  title      String
+  duration   Int
+  url        String
+  chapter_id Int
+  chapters   Chapters @relation(fields: [chapter_id], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
