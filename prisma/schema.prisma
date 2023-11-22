@@ -10,15 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Roles {
-  admin
-  user
-}
-
 enum Levels {
   beginners
   intermediate
   advanced
+}
+
+model Admin {
+  id        Int       @id @default(autoincrement())
+  idAdmin   String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 // model users
@@ -27,7 +30,6 @@ model Users {
   nickname  String
   email     String    @unique
   password  String
-  role      Roles     @default(user)
   courses   Courses[]
   profile   Profiles?
   createdAt DateTime  @default(now())
