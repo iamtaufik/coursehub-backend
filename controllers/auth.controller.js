@@ -29,8 +29,8 @@ const loginAdmin = async (req, res, next) => {
     }
 
     const payload = {
+      id: admin.id,
       idAdmin: admin.idAdmin,
-      email: admin.email,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
