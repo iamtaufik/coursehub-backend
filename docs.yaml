@@ -1,0 +1,123 @@
+openapi: 3.0.0
+info:
+  title: docs API
+  description: Documentasi API untuk autentikasi pengguna (berbasis Token)
+  version: 1.0.0
+  contact:
+    name: CourseHub
+    email: CourseHubreal@gmail.com
+paths:
+  /auth/register:
+    post:
+      summary: Membuat akun baru dan mengirimkan OTP ke email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: "Julia"
+                email:
+                  type: string
+                  example: "julilia@gmail.com"
+                phone:
+                  type: string
+                  example: "0813238727"
+                password:
+                  type: string
+                  example: "password"
+      responses:
+        '200':
+          description: Akun berhasil dibuat, OTP terkirim
+
+  /verify-otp:
+    post:
+      summary: Verifikasi OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                otp:
+                  type: string
+                  example: "232343" #contoh otp yang di kiirim
+                email:
+                  type: string
+                  example: "julilia@gmail.com"
+      responses:
+        '200':
+          description: OTP berhasil diverifikasi
+
+  /auth/login:
+    post:
+      summary: Masuk dengan email dan kata sandi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "julilia@gmail.com"
+                password:
+                  type: string
+                  example: "password"
+      responses:
+        '200':
+          description: Pengguna berhasil masuk, mengembalikan token akses
+
+  # /forgot-password:
+  #   post:
+  #     summary: Reset kata sandi pengguna dan kirim URL reset
+  #     requestBody:
+  #       required: true
+  #       content:
+  #         application/json:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               email:
+  #                 type: string
+  #                 example: "julilia@gmail.com"
+  #     responses:
+  #       '200':
+  #         description: Tautan reset kata sandi berhasil dikirim
+
+  /reset-password/{token}:
+    post:
+      summary: Verifikasi token dan perbarui kata sandi
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newPassword:
+                  type: string
+                  example: "passwordbaru"
+                password_confirmation:
+                  type: string
+                  example: "passwordbaru"
+      responses:
+        '200':
+          description: Kata sandi berhasil diperbarui
+
+# components:
+#   securitySchemes:
+#     bearerAuth:
+#       type: http
+#       scheme: bearer
