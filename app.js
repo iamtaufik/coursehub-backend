@@ -1,0 +1,25 @@
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const cors = require('cors');
+const yaml = require('yaml');
+const swaggerUi = require('swagger-ui-express');
+const fs = require('fs');
+const path = require('path');
+const { serverError, notFound } = require('./middlewares/errorHandling');
+const PORT = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const file = fs.readFileSync(path.join(__dirname, './docs.yaml'), 'utf8');
+const swaggerDocument = yaml.parse(file);
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api/v1', require('./routes/index.route'));
+app.use(notFound);
+app.use(serverError);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
