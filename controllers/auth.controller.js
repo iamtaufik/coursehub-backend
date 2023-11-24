@@ -1,14 +1,29 @@
-const prisma = require("../libs/prisma");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const { JWT_SECRET } = process.env;
-const otpHandler= require("../libs/otpHandler");
-const nodemailer = require("../libs/nodemailer");
+const prisma = require('../libs/prisma');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const otpHandler = require('../libs/otpHandler');
+const nodemailer = require('../libs/nodemailer');
+const { registerUserSchema, createAdminSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema } = require('../validations/auth.validation');
 
 // login user
 const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
+    const { value, error } = await loginUserSchema.validateAsync({
+      email,
+      password,
+    });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bad Request',
+        err: error.message,
+        data: null,
+      });
+    }
+
     const user = await prisma.users.findUnique({
       where: {
         email: email,
@@ -18,8 +33,8 @@ const loginUser = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Bad Request",
-        err: "User not found",
+        message: 'Bad Request',
+        err: 'User not found',
         data: null,
       });
     }
@@ -29,24 +44,36 @@ const loginUser = async (req, res, next) => {
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: "Bad Request",
-        err: "Wrong Password",
+        message: 'Bad Request',
+        err: 'Wrong Email or Password',
+        data: null,
+      });
+    }
+
+    if (!user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bad Request',
+        err: 'User not verified',
         data: null,
       });
     }
 
     const payload = {
       id: user.id,
+      nickname: user.nickname,
       email: user.email,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: '1d',
     });
+
+    delete user.password;
 
     return res.status(200).json({
       success: true,
-      message: "Login success",
+      message: 'Login success',
       err: null,
       data: {
         user: user,
@@ -61,26 +88,33 @@ const loginUser = async (req, res, next) => {
 // register
 const register = async (req, res, next) => {
   try {
-    let { nickname, email, password, password_confirmation } = req.body;
+    let { nickname, email, phone_number, password } = req.body;
 
-    if (password != password_confirmation) {
+    const { value, error } = await registerUserSchema.validateAsync({
+      nickname,
+      email,
+      phone_number,
+      password,
+    });
+
+    if (error) {
       return res.status(400).json({
         status: false,
-        message: 'Bad Requset',
-        err: 'Password & password confirmation do not match!',
-        data: null
+        message: 'Bad Request',
+        err: error.message,
+        data: null,
       });
     }
 
     let userExist = await prisma.users.findUnique({
-      where: { email: email }
+      where: { email: email },
     });
     if (userExist) {
       return res.status(400).json({
         status: false,
         message: 'Bad Request',
         err: 'Email already exists!',
-        data: null
+        data: null,
       });
     }
 
@@ -90,8 +124,8 @@ const register = async (req, res, next) => {
       data: {
         nickname,
         email,
-        password: encryptedPassword
-      }
+        password: encryptedPassword,
+      },
     });
 
     const user_id = users.id;
@@ -100,17 +134,17 @@ const register = async (req, res, next) => {
         users_id: user_id,
         first_name: null,
         last_name: null,
+        phone_number: phone_number,
         profile_picture: null,
         city: null,
-        country: null
-      }
+        country: null,
+      },
     });
-    const token = jwt.sign({ user_id: users.id }, JWT_SECRET, { expiresIn: '1h' });
-    
+    delete users.password;
+
     const otp = await otpHandler.generateOTP(email);
     const html = `Your OTP for account activation is: <strong>${otp}</strong>`;
     await nodemailer.sendEmail(email, 'Account Activation OTP', html);
-
 
     return res.status(201).json({
       status: true,
@@ -118,8 +152,7 @@ const register = async (req, res, next) => {
       err: null,
       data: {
         users,
-        token, // Menambahkan token ke respons
-      }
+      },
     });
   } catch (err) {
     next(err);
@@ -129,6 +162,21 @@ const register = async (req, res, next) => {
 const loginAdmin = async (req, res, next) => {
   try {
     const { idAdmin, password } = req.body;
+
+    const { value, error } = await loginAdminSchema.validateAsync({
+      idAdmin,
+      password,
+    });
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bad Request',
+        err: error.message,
+        data: null,
+      });
+    }
+
     const admin = await prisma.admin.findUnique({
       where: {
         idAdmin: idAdmin,
@@ -171,101 +219,119 @@ const loginAdmin = async (req, res, next) => {
     next(error);
   }
 };
-  
 
 const authenticate = (req, res, next) => {
   return res.status(200).json({
     status: true,
-    message: "OK",
+    message: 'OK',
     err: null,
     data: { user: req.user },
   });
 };
 
+const createAdmin = async (req, res, next) => {
+  try {
+    const { idAdmin, password } = req.body;
+
+    const { value, error } = await createAdminSchema.validateAsync({
+      idAdmin,
+      password,
+    });
+
+    const admin = await prisma.admin.findUnique({
+      where: {
+        idAdmin: idAdmin,
+      },
+    });
+
+    if (admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'Admin already exists',
+        data: null,
+      });
+    }
+
+    const encryptedPassword = await bcrypt.hash(password, 10);
+
+    const newAdmin = await prisma.admin.create({
+      data: {
+        idAdmin,
+        password: encryptedPassword,
+      },
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Created Successfully!',
+      data: newAdmin,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const verifyOTP = async (req, res) => {
   try {
-      const token = req.headers.authorization;
+    const { email, otp } = req.body;
 
-      if (!token || !token.startsWith('Bearer ')) {
-          return res.status(401).json({
-              status: false,
-              message: 'Token not found or invalid',
-              err: null,
-              data: null
-          });
-      }
+    const { value, error } = await verifyOTPSchema.validateAsync({
+      email,
+      otp,
+    });
 
-      const tokenValue = token.split(' ')[1]; // Mengambil token setelah "Bearer "
-
-      if (!tokenValue) {
-          return res.status(401).json({
-              status: false,
-              message: 'Token not found or invalid',
-              err: null,
-              data: null
-          });
-      }
-
-      const decoded = jwt.verify(tokenValue, process.env.JWT_SECRET);
-
-      if (!decoded.email) {
-          return res.status(400).json({
-              status: false,
-              message: 'Bad request',
-              err: 'Email not found in token',
-              data: null
-          });
-      }
-
-      const email = decoded.email;
-      const { otp } = req.body;
-
-      const user = await prisma.users.findUnique({ where: { email } });
-
-      if (!user) {
-          return res.status(404).json({
-              status: false,
-              message: 'User not found',
-              err: null,
-              data: null
-          });
-      }
-
-      const storedOTP = await otpHandler.getOTPFromStorage(email);
-
-      if (otp !== storedOTP) {
-          return res.status(400).json({
-              status: false,
-              message: 'Bad request',
-              err: 'Invalid or expired OTP',
-              data: null
-          });
-      }
-
-      // OTP yang sesuai, tandai verifikasi pengguna di sini jika perlu
-      await prisma.users.update({
-          where: { email },
-          data: { is_verified: true, otp: null }
+    if (error) {
+      return res.status(400).json({
+        status: false,
+        message: 'Bad Request',
+        err: error.message,
+        data: null,
       });
+    }
 
-      return res.json({
-          status: true,
-          message: 'Account activated successfully',
-          err: null,
-          data: null
+    const user = await prisma.users.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: 'User not found',
+        err: null,
+        data: null,
       });
+    }
+
+    const storedOTP = await otpHandler.getOTPFromStorage(email);
+
+    if (otp !== storedOTP) {
+      return res.status(400).json({
+        status: false,
+        message: 'Bad request',
+        err: 'Invalid OTP',
+        data: null,
+      });
+    }
+
+    // OTP yang sesuai, tandai verifikasi pengguna di sini jika perlu
+    await prisma.users.update({
+      where: { email },
+      data: { isVerified: true, otp: null },
+    });
+
+    return res.json({
+      status: true,
+      message: 'Account activated successfully',
+      err: null,
+      data: null,
+    });
   } catch (err) {
-      return res.status(500).json({
-          status: false,
-          message: 'Error activating account',
-          err: err.message,
-          data: null
-      });
+    next(err);
   }
 };
 module.exports = {
   loginUser,
   loginAdmin,
   register,
-  verifyOTP
+  verifyOTP,
+  authenticate,
+  createAdmin,
 };
