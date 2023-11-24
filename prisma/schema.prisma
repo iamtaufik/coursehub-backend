@@ -32,6 +32,7 @@ model Users {
   password  String
   courses   Courses[]
   profile   Profiles?
+  isVerified Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -40,6 +41,7 @@ model Users {
 model Profiles {
   id              Int     @id @default(autoincrement())
   users_id        Int     @unique
+  phone_number    String?
   first_name      String?
   last_name       String?
   profile_picture String?
