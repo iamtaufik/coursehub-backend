@@ -44,7 +44,7 @@ model Profiles {
   last_name       String?
   profile_picture String?
   city            String?
-  country         String?
+  country          String?
   users           Users   @relation(fields: [users_id], references: [id])
 }
 
