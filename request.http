@@ -1,4 +1,3 @@
-
 ### register
 POST http://localhost:3000/api/v1/auth/register
 Content-Type: application/json
@@ -22,3 +21,24 @@ Content-Type: application/json
 ### login
 GET http://localhost:3000/api/v1/auth/whoami
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJtYWlsYWFAZ21haWwuY29tIiwiaWF0IjoxNzAwODA3NTEzLCJleHAiOjE3MDA4OTM5MTN9.oX6w5a0CnFl1oMOpHz-JkXuWatdI9KZsX3TF8eaVjhA
+=======
+### register
+POST http://localhost:3000/api/v1/auth/register/
+Content-Type: application/json
+
+{
+  "nickname": "usertest01",
+  "email":"usertest01@gmail.com",
+  "password": "usertest123",
+  "password_confirmation": "usertest123"
+}
+###
+POST http://localhost:3000/api/v1/auth/register/
+Content-Type: application/json
+
+{
+  "nickname": "usertest02",
+  "email":"usertest02@gmail.com",
+  "password": "usertest02",
+  "password_confirmation": "usertest02"
+}
