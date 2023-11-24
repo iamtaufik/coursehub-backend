@@ -30,6 +30,8 @@ model Users {
   nickname  String
   email     String    @unique
   password  String
+  otp       String?
+  is_verified Boolean @default(false)// perubahan
   courses   Courses[]
   profile   Profiles?
   isVerified Boolean   @default(false)
@@ -46,7 +48,7 @@ model Profiles {
   last_name       String?
   profile_picture String?
   city            String?
-  country          String?
+  country         String?
   users           Users   @relation(fields: [users_id], references: [id])
 }
 
