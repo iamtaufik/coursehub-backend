@@ -4,13 +4,11 @@
   "description": "Final project for the coursehub backend",
   "main": "index.js",
   "scripts": {
-    "generate": "npx prisma generate",
-    "build": "npm run generate",
-    "start": "npm run build && node app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js",
     "db-pull": "prisma db pull",
     "db-migrate": "prisma migrate dev --name init",
-    "postinstall": "prisma generate"
+    "postinstall": "npx prisma generate"
   },
   "author": "BEJS Group 1",
   "license": "ISC",
