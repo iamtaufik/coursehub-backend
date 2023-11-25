@@ -90,6 +90,20 @@ CREATE TABLE "Modules" (
     CONSTRAINT "Modules_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "UserCourseProgress" (
+    "id" SERIAL NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "courseId" INTEGER NOT NULL,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "progress" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "lastAccessed" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "UserCourseProgress_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Admin_idAdmin_key" ON "Admin"("idAdmin");
 
@@ -113,3 +127,9 @@ ALTER TABLE "Chapters" ADD CONSTRAINT "Chapters_course_id_fkey" FOREIGN KEY ("co
 
 -- AddForeignKey
 ALTER TABLE "Modules" ADD CONSTRAINT "Modules_chapter_id_fkey" FOREIGN KEY ("chapter_id") REFERENCES "Chapters"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserCourseProgress" ADD CONSTRAINT "UserCourseProgress_userId_fkey" FOREIGN KEY ("userId") REFERENCES "Users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "UserCourseProgress" ADD CONSTRAINT "UserCourseProgress_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Courses"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
