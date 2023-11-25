@@ -1,63 +1,316 @@
 openapi: 3.0.0
 info:
-  title: docs API
+  title: Docs API Backend Coursehub
   description: Documentasi API untuk autentikasi pengguna (berbasis Token)
   version: 1.0.0
   contact:
     name: CourseHub
     email: CourseHubreal@gmail.com
+servers:
+  - url: http://localhost:3000/api/v1
+  - url: https://backend_coursehub.test/api/v1
+  - url: https://backend_coursehub.com/api/v1
+tags:
+  - name: Users
+    description: Operations related to auth Users
+  - name: Admin
+    description: Operations related to auth Admin
 paths:
   /auth/register:
     post:
-      summary: Membuat akun baru dan mengirimkan OTP ke email
+      tags: 
+      - Users
+      operationId: post-create-register
+      summary: Register new users
+      description: Successful account registration, check the account activation otp code in your email
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                  example: "Julia"
-                email:
-                  type: string
-                  example: "julilia@gmail.com"
-                phone:
-                  type: string
-                  example: "0813238727"
-                password:
-                  type: string
-                  example: "password"
-      responses:
-        '200':
-          description: Akun berhasil dibuat, OTP terkirim
-
-  /verify-otp:
+            $ref: '#/components/requestBodies/createRegister'
+      responses: 
+        "201":
+          description: Succesfull Register!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RegisterModel'
+                        
+  /auth/verifyOTP:
     post:
-      summary: Verifikasi OTP
+      tags:
+      - Users
+      operationId: post-verify-otp
+      summary: Verify OTP (OTP Aktivasi)
+      description: Verify otp after account registration
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                otp:
-                  type: string
-                  example: "232343" #contoh otp yang di kiirim
-                email:
-                  type: string
-                  example: "julilia@gmail.com"
-      responses:
-        '200':
-          description: OTP berhasil diverifikasi
-
+            $ref: '#/components/requestBodies/createOtp'
+      responses: 
+        "201":
+          description: Account activated successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VerifyOtpModel'
+                        
+                        
   /auth/login:
     post:
-      summary: Masuk dengan email dan kata sandi
+      tags: 
+      - Users
+      operationId: post-login-users
+      summary: Login Users
+      description: Users account login
       requestBody:
-        required: true
+            $ref: '#/components/requestBodies/createLoginUsers'
+      responses: 
+        "201":
+          description: Login success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginUserModel'
+                        
+                        
+  /auth/whoami:
+    get:
+      tags:
+        - Users
+      operationId: get-fetch-whoami
+      summary: Get Whoami
+      description: Retrieves details of a specific users.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BasicResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/WhoamiModel"
+                        
+      security:
+      - bearerAuth: []
+                        
+                        
+                        
+  /auth/admin/register:
+    post:
+      tags: 
+      - Admin
+      operationId: post-create-admin
+      summary: Register new Admin
+      description: Register new admin
+      requestBody:
+            $ref: '#/components/requestBodies/createAdmin'
+      responses: 
+        "201":
+          description: Succesfull Create Admin!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminModel'
+                        
+                        
+  /auth/admin/login:
+    post:
+      tags: 
+      - Admin
+      operationId: post-login-admin
+      summary: Login Admin
+      description: Admin account login
+      requestBody:
+            $ref: '#/components/requestBodies/createLoginAdmin'
+      responses: 
+        "201":
+          description: Login success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginAdminModel'
+                        
+      
+        
+
+
+
+
+
+
+
+components:
+  securitySchemes:
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+
+  schemas:
+    BasicResponse:
+      title: BasicResponse
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: "OK"
+          
+    RegisterModel:
+      title: Register
+      type: object
+      properties:
+        nickname:
+          type: string
+          example: "test01"
+        email:
+          type: string
+          example: "test_dev@gmail.com"
+        phone_number:
+          type: string
+          example: 0898829918291
+        password:
+          type: string
+          example: "test123"
+          
+    VerifyOtpModel:
+      title: verifyOTP
+      type: object
+      properties:
+        null:
+          type: string
+          example: 
+     
+   
+    LoginUserModel:
+      title: Login Users
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nickname:
+          type: string
+          example: "usertest02"
+        email:
+          type: string
+          example: "usertest03@gmail.com"
+        otp:
+          type: string
+          example: "null"
+        isVerified:
+          type: string
+          example: "true"
+          
+    WhoamiModel:
+      title: Whoami Users & Admin
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nickname:
+          type: string
+          example: "usertest02"
+        email:
+          type: string
+          example: "usertest03@gmail.com"
+        iat:
+          type: integer
+          example: 1700840557
+        exp:
+          type: integer
+          example: 1700926957
+          
+    LoginAdminModel:
+      title: Login Admin
+      type: object
+      properties:
+        data:
+          type: string
+          example: "yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWJAZ21haWwuY29tIiwiaWF0IjoxNzAwODQxNjUyLCJleHAiOjE3MDA5MjgwNTJ9.Xj7FsT6aPtXTZISozyYp8oKABQ8eyLSh0JJBeD2g"
+          
+    
+    UsersModel:
+      title: Users
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nickname:
+          type: string
+          example: "test"
+        email:
+          type: string
+          example: "test_dev@gmail.com"
+        password:
+          type: string
+          example: "test_dev020102"
+          
+    AdminModel:
+      title: Admin
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        idAdmin:
+          type: string
+          example: "admin-course-hub"
+        password:
+          type: string
+          example: "admin123"
+          
+          
+  requestBodies:
+      createRegister:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                  example: "usertest01"
+                email:
+                  type: string
+                  example: "usertest01@gmail.com"
+                phone_number:
+                  type: string
+                  example: "089627188292"
+                password:
+                  type: string
+                  example: "usertest123"
+                  
+      createOtp:
         content:
           application/json:
             schema:
@@ -65,59 +318,49 @@ paths:
               properties:
                 email:
                   type: string
-                  example: "julilia@gmail.com"
-                password:
+                  example: "usertest01@gmail.com"
+                otp:
                   type: string
-                  example: "password"
-      responses:
-        '200':
-          description: Pengguna berhasil masuk, mengembalikan token akses
+                  example: "jpK9oX"
 
-  # /forgot-password:
-  #   post:
-  #     summary: Reset kata sandi pengguna dan kirim URL reset
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               email:
-  #                 type: string
-  #                 example: "julilia@gmail.com"
-  #     responses:
-  #       '200':
-  #         description: Tautan reset kata sandi berhasil dikirim
-
-  /reset-password/{token}:
-    post:
-      summary: Verifikasi token dan perbarui kata sandi
-      parameters:
-        - in: path
-          name: token
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
+                  
+      createLoginUsers:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: "usertest01@gmail.com"
+                  password:
+                    type: string
+                    example: "usertest123"
+                    
+      createLoginAdmin:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idAdmin:
+                    type: string
+                    example: "admin-course-hub@gmail.com"
+                  password:
+                    type: string
+                    example: "admin123"
+                    
+                    
+      createAdmin:
         content:
           application/json:
             schema:
               type: object
               properties:
-                newPassword:
+                idAdmin:
                   type: string
-                  example: "passwordbaru"
-                password_confirmation:
+                  example: "admin-course-hub"
+                password:
                   type: string
-                  example: "passwordbaru"
-      responses:
-        '200':
-          description: Kata sandi berhasil diperbarui
-
-# components:
-#   securitySchemes:
-#     bearerAuth:
-#       type: http
-#       scheme: bearer
+                  example: "admin123"
+  

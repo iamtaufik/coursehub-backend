@@ -1,3 +1,4 @@
+require('dotenv').config();
 const prisma = require('../libs/prisma');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
