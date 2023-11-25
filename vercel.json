@@ -1,6 +1,13 @@
 {
   "version": 2,
   "name": "coursehub-backend",
-  "builds": [{ "src": "app.js", "use": "@vercel/node" }, "buildCommand": "npx prisma generate"],
+  "builds": [{ 
+    "src": "app.js", 
+    "use": "@vercel/node", 
+    "config":{
+      "NODE_VERSION": "18"    
+    }, 
+    "buildCommand": "npx prisma generate"
+  }],
   "routes": [{ "src": "/(.*)", "dest": "/app.js" }]
 }
