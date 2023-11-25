@@ -21,7 +21,11 @@ app.use(morgan('dev'));
 
 const file = fs.readFileSync(path.join(__dirname, './docs.yaml'), 'utf8');
 const swaggerDocument = yaml.parse(file);
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css' }));
+app.use(
+  '/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerDocument, { customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.10.3/swagger-ui.min.css', customJs: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.10.3/swagger-ui-bundle.min.js' ,customSiteTitle: 'CourseHub API Documentation 🚀'},)
+);
 app.use('/api/v1', require('./routes/index.route'));
 app.use(notFound);
 app.use(serverError);
