@@ -10,7 +10,7 @@ servers:
   - url: http://localhost:3000/api/v1
   - url: https://backend_coursehub.test/api/v1
   - url: https://coursehub-development.vercel.app/api/v1
-  - url: https://coursehub-backend.vercel.app/api/v1
+  - url: https://coursehub-production.vercel.app/api/v1
 tags:
   - name: Users
     description: Operations related to auth Users
