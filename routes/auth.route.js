@@ -4,7 +4,7 @@ const verifyToken = require('../libs/verifyToken');
 const verifyAdmin = require('../libs/verifyAdmin');
 
 router.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.send('Hello World! this is development branch');
 });
 
 router.post('/login', loginUser);
