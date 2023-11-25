@@ -7,8 +7,7 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "db-pull": "prisma db pull",
-    "db-migrate": "prisma migrate dev --name init",
-    "postinstall": "npx prisma generate"
+    "db-migrate": "prisma migrate dev --name init"
   },
   "author": "BEJS Group 1",
   "license": "ISC",
