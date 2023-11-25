@@ -21,7 +21,7 @@ app.use(morgan('dev'));
 
 const file = fs.readFileSync(path.join(__dirname, './docs.yaml'), 'utf8');
 const swaggerDocument = yaml.parse(file);
-app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, { customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.0.0/swagger-ui.min.css' }));
 app.use('/api/v1', require('./routes/index.route'));
 app.use(notFound);
 app.use(serverError);
