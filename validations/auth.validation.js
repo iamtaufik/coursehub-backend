@@ -6,7 +6,6 @@ const registerUserSchema = joi.object({
   password: joi.string().min(6).required(),
   phone: joi
     .string()
-    .length(10)
     .pattern(/^[0-9]+$/)
     .required(),
 });
@@ -22,12 +21,12 @@ const verifyOTPSchema = joi.object({
 });
 
 const createAdminSchema = joi.object({
-  idAdmin: joi.string().email().required(),
+  idAdmin: joi.string().required(),
   password: joi.string().min(6).required(),
 });
 
 const loginAdminSchema = joi.object({
-  idAdmin: joi.string().email().required(),
+  idAdmin: joi.string().required(),
   password: joi.string().min(6).required(),
 });
 

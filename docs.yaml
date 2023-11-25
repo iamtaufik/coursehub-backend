@@ -154,7 +154,39 @@ paths:
                       data:
                         $ref: '#/components/schemas/LoginAdminModel'
                         
-      
+  /auth/admin/whoami:
+    get:
+      tags:
+        - Admin
+      operationId: get-fetch-whoami-admin
+      summary: Get Whoami Admin
+      description: Retrieves details of a specific admin.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BasicResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/WhoamiModel"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BasicResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+                        example: Unauthorized                
+      security:
+      - bearerAuth: []    
         
 
 
@@ -345,7 +377,7 @@ components:
                 properties:
                   idAdmin:
                     type: string
-                    example: "admin-course-hub@gmail.com"
+                    example: "admin-course-hub"
                   password:
                     type: string
                     example: "admin123"
