@@ -7,7 +7,8 @@
     "start": "node app.js",
     "dev": "nodemon app.js",
     "db-pull": "prisma db pull",
-    "db-migrate": "prisma migrate dev --name init"
+    "db-migrate": "prisma migrate dev --name init",
+    "postinstall": "npx prisma generate"
   },
   "author": "BEJS Group 1",
   "license": "ISC",
@@ -17,10 +18,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "googleapis": "^128.0.0",
     "joi": "^17.11.0",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "nodemailer": "^6.9.7",
-    "swagger-ui-express": "^5.0.0",
+    "otp-generator": "^4.0.1",
+    "swagger-ui-express": "^4.6.2",
     "yaml": "^2.3.4"
   },
   "devDependencies": {

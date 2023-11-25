@@ -3,11 +3,13 @@
 
 generator client {
   provider = "prisma-client-js"
+  // output = "./generated/client"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
 }
 
 enum Levels {
@@ -17,11 +19,11 @@ enum Levels {
 }
 
 model Admin {
-  id        Int       @id @default(autoincrement())
-  idAdmin   String    @unique
+  id        Int      @id @default(autoincrement())
+  idAdmin   String   @unique
   password  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // model users
@@ -30,8 +32,11 @@ model Users {
   nickname  String
   email     String    @unique
   password  String
+  otp       String?
   courses   Courses[]
   profile   Profiles?
+  userCourseProgress UserCourseProgress[]
+  isVerified Boolean   @default(false)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
@@ -40,11 +45,12 @@ model Users {
 model Profiles {
   id              Int     @id @default(autoincrement())
   users_id        Int     @unique
+  phone_number    String?
   first_name      String?
   last_name       String?
   profile_picture String?
   city            String?
-  coutry          String?
+  country         String?
   users           Users   @relation(fields: [users_id], references: [id])
 }
 
@@ -66,6 +72,7 @@ model Courses {
   price        Int
   ratings      Int
   author       String
+  userCourseProgress UserCourseProgress[]
   chapter_id   Int
   chapters     Chapters[]
   category_id  Int
@@ -93,4 +100,19 @@ model Modules {
   chapters   Chapters @relation(fields: [chapter_id], references: [id])
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model UserCourseProgress {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  courseId     Int
+  completed    Boolean  @default(false)
+  progress     Float    @default(0) // Misalkan menggunakan nilai 0-100 untuk progress
+  lastAccessed DateTime @updatedAt
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relationships
+  user         Users    @relation(fields: [userId], references: [id])
+  course       Courses  @relation(fields: [courseId], references: [id])
 }
