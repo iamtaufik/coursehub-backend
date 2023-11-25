@@ -4,7 +4,9 @@
   "description": "Final project for the coursehub backend",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "generate": "npx prisma generate",
+    "build": "npm run generate",
+    "start": "npm run build && node app.js",
     "dev": "nodemon app.js",
     "db-pull": "prisma db pull",
     "db-migrate": "prisma migrate dev --name init",
