@@ -100,8 +100,8 @@ GET http://localhost:3000/api/v1/courses/course
 Content-Type: application/json
 
 ###
-GET http://localhost:3000/api/v1/courses/course?level=beginner&page=2&pageSize=10
+GET http://localhost:3000/api/v1/courses?level=beginner&page=2&pageSize=10
 Content-Type: application/json
 ###
-GET http://localhost:3000/api/v1/courses/course
+GET http://localhost:3000/api/v1/courses
 Content-Type: application/json

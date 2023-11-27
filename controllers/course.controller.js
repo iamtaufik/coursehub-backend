@@ -1,5 +1,6 @@
 const prisma = require('../libs/prisma');
 const { createCourseSchema, getCourseSchema } = require('../validations/course.validation');
+const { getPagination } = require('../libs/getPaggination');
 
 const createCourse = async (req, res, next) => {
   const { title, description, price, image, chapters, requirements, author, level } = req.body;
@@ -63,63 +64,90 @@ const createCourse = async (req, res, next) => {
   }
 };
 
-const getCourse = async (req, res, next) => {
+const getCourses = async (req, res, next) => {
   try {
-    const { error } = getCourseSchema.validate(req.query);
-    if (error) {
-      return res.status(400).json({
-        status: false,
-        message: 'Validation Error',
-        err: error.details[0].message,
-        data: null,
+    if (req.query.search) {
+      const { search } = req.query;
+
+      const courses = await prisma.courses.findMany({
+        where: {
+          title: {
+            contains: search,
+            mode: 'insensitive',
+          },
+        },
+      });
+
+      return res.status(200).json({
+        status: true,
+        message: 'Courses retrieved successfully',
+        data: courses,
       });
     }
 
-    const { level, page, pageSize } = req.query;
-       const whereCondition = {
-      isActive: true, 
+    if (req.query.level || req.category || req.query.filter) {
+      const { level, category, fillter } = req.query;
+
+      const filterOptions = {
+        populer: { orderBy: { ratings: 'desc' } },
+        terbaru: { orderBy: { createdAt: 'desc' } },
       };
 
-    if (level) {
-      whereCondition.level = level;
+      const courses = await prisma.courses.findMany({
+        ...filterOptions[fillter],
+        where: {
+          category: {
+            name_categories: typeof category === 'string' ? { in: [category] } : { in: [...category] },
+          },
+          ...(level && { level })
+        },
+
+        
+      });
+
+      return res.status(200).json({
+        status: true,
+        message: 'Courses retrieved successfully',
+        data: courses,
+      });
+    }
+    if (req.query.page || req.query.limit) {
+      const { page = 1, limit = 10 } = req.query;
+
+      const courses = await prisma.courses.findMany({
+        skip: (Number(page) - 1) * Number(limit),
+        take: Number(limit),
+      });
+
+      const { _count } = await prisma.courses.aggregate({
+        _count: { id: true },
+      });
+
+      const pagination = getPagination(req, _count.id, Number(page), Number(limit));
+
+      return res.status(200).json({
+        status: true,
+        message: 'Courses retrieved successfully',
+        data: {
+          courses,
+          pagination,
+        },
+      });
     }
 
-    const currentPage = parseInt(page, 10) || 1;
-    const perPage = parseInt(pageSize, 10) || 10;
-    const offset = (currentPage - 1) * perPage;
+    const courses = await prisma.courses.findMany();
 
-    const totalCourses = await prisma.courses.count({
-      where: whereCondition,
-    });
-
-    const courses = await prisma.courses.findMany({
-      where: whereCondition,
-      include: {
-      },
-      take: perPage, 
-      skip: offset, 
-    });
-
-    
-    res.status(200).json({
+    return res.status(200).json({
       status: true,
       message: 'Courses retrieved successfully',
-      data: {
-        courses,
-        currentPage,
-        pageSize: perPage,
-        totalCourses,
-        totalPages: Math.ceil(totalCourses / perPage),
-      },
+      data: courses,
     });
   } catch (error) {
     next(error);
   }
 };
 
-
 module.exports = {
   createCourse,
-  getCourse,
+  getCourses,
 };
-
