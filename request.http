@@ -4,11 +4,11 @@ Content-Type: application/json
 
 {
     "nickname": "test",
-    "email": "milid58981@cumzle.com",
-    "password": "test",
-    "password_confirmation": "test"
+    "email": "asd@gmail.com",
+    "phone_number": "081111111111",
+    "password": "testasd"
 } 
-
+   
 ### OTP
 POST http://localhost:3000/api/v1/auth/verifyOTP
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMSwiaWF0IjoxNzAwODI4MTAwLCJleHAiOjE3MDA4MzE3MDB9.LXQ8hjvAeJFh-QKRimweLZZDKaUxZp94Vec9nDjsSuo
@@ -16,4 +16,12 @@ Content-Type: application/json
 
 {
     "otp": "GiphuW"
+}
+
+### forgot password
+POST http://localhost:3000/api/v1/auth/resetPassword
+Content-Type: application/json
+
+{
+    "email": "asd@gmail.com"
 }
