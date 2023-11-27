@@ -28,6 +28,13 @@ Content-Type: application/json
   "password":"user123"
 }
 
+### forgot password
+POST http://localhost:3000/api/v1/auth/resetPassword
+Content-Type: application/json
+
+{
+    "email": "asd@gmail.com"
+}
 
 ### Whoami
 GET http://localhost:3000/api/v1/auth/whoami
