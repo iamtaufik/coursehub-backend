@@ -3,19 +3,29 @@ POST http://localhost:3000/api/v1/auth/register
 Content-Type: application/json
 
 {
-    "nickname": "test",
-    "email": "asd@gmail.com",
-    "phone_number": "081111111111",
-    "password": "testasd"
-} 
-   
+  "nickname":"usertest02",
+  "email":"jeni.riskaa@gmail.com",
+  "phone_number":"0888288293",
+  "password":"user123"
+}
+
 ### OTP
 POST http://localhost:3000/api/v1/auth/verifyOTP
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxMSwiaWF0IjoxNzAwODI4MTAwLCJleHAiOjE3MDA4MzE3MDB9.LXQ8hjvAeJFh-QKRimweLZZDKaUxZp94Vec9nDjsSuo
 Content-Type: application/json
 
 {
-    "otp": "GiphuW"
+  "email":"jeni.riskaa@gmail.com",
+  "otp": "1T6vrY"
+}
+
+
+### Login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email":"jeni.riskaa@gmail.com",
+  "password":"user123"
 }
 
 ### forgot password
@@ -25,3 +35,64 @@ Content-Type: application/json
 {
     "email": "asd@gmail.com"
 }
+
+### Whoami
+GET http://localhost:3000/api/v1/auth/whoami
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwibmlja25hbWUiOiJ1c2VydGVzdDAyIiwiZW1haWwiOiJqZW5pLnJpc2thYUBnbWFpbC5jb20iLCJpYXQiOjE3MDEwNzQzNzAsImV4cCI6MTcwMTE2MDc3MH0.2qonpyEJofVAli-3qsJdDV5tTUGvDZIFtFFnjxzT7pA
+
+### Login ad,min
+POST http://localhost:3000/api/v1/auth/admin/login
+Content-Type: application/json
+
+{
+  "idAdmin":"admin-course-hubb@gmail.com",
+  "password":"admin123"
+}
+
+###
+POST http://localhost:3000/api/v1/courses
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWJiQGdtYWlsLmNvbSIsImlhdCI6MTcwMTA3NDU3MCwiZXhwIjoxNzAxMTYwOTcwfQ.ylBls4v8lShsN-Yt22bcBJfunhg-MFmEsGHr9nkqkPI
+
+{
+  "title": "course beginner 11",
+  "description": "beginner 11",
+  "image": "https://youtu.be/kWT1uGvhWp8?feature=shared",
+  "price": 99,
+  "author": "CourseHub",
+  "level": "beginner",
+  "category_id": 6,
+  "requirements": ["Requirement 11", "Requirement 2","Requirement 99"],
+  "chapters": [
+    {
+      "name": "Chapter 999",
+      "modules": [
+        {
+          "title": "Module 1",
+          "duration": 60,
+          "url": "https://youtu.be/kWT1uGvhWp8?feature=shared"
+        },
+        {
+          "title": "Module 2",
+          "duration": 45,
+          "url": "https://youtu.be/kWT1uGvhWp8?feature=shared"
+        }
+      ]
+    }
+  ]
+}
+
+###
+GET http://localhost:3000/api/v1/courses/course?level=beginner
+Content-Type: application/json
+
+###
+GET http://localhost:3000/api/v1/courses/course
+Content-Type: application/json
+
+###
+GET http://localhost:3000/api/v1/courses/course?level=beginner&page=2&pageSize=10
+Content-Type: application/json
+###
+GET http://localhost:3000/api/v1/courses/course
+Content-Type: application/json

@@ -21,12 +21,12 @@ const verifyOTPSchema = joi.object({
 });
 
 const createAdminSchema = joi.object({
-  idAdmin: joi.string().email().required(),
+  idAdmin: joi.string().required(),
   password: joi.string().min(6).required(),
 });
 
 const loginAdminSchema = joi.object({
-  idAdmin: joi.string().email().required(),
+  idAdmin: joi.string().required(),
   password: joi.string().min(6).required(),
 });
 

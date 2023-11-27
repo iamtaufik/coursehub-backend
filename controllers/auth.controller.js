@@ -99,7 +99,7 @@ const register = async (req, res, next) => {
     const { value, error } = await registerUserSchema.validateAsync({
       nickname,
       email,
-      phone_number,
+      phone: phone_number,
       password,
     });
 
