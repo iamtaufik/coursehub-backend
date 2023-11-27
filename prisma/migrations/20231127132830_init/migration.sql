@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Levels" AS ENUM ('beginners', 'intermediate', 'advanced');
+CREATE TYPE "Levels" AS ENUM ('beginner', 'intermediate', 'advanced');
 
 -- CreateTable
 CREATE TABLE "Admin" (
@@ -55,7 +55,7 @@ CREATE TABLE "Courses" (
     "description" TEXT NOT NULL,
     "image" TEXT,
     "requirements" TEXT[],
-    "level" "Levels" NOT NULL DEFAULT 'beginners',
+    "level" "Levels" NOT NULL DEFAULT 'beginner',
     "price" INTEGER NOT NULL,
     "ratings" INTEGER NOT NULL,
     "author" TEXT NOT NULL,

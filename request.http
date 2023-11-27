@@ -3,9 +3,9 @@ POST http://localhost:3000/api/v1/auth/register
 Content-Type: application/json
 
 {
-  "nickname":"usertest02",
-  "email":"jeni.riskaa@gmail.com",
-  "phone_number":"0888288293",
+  "nickname":"usertest03",
+  "email":"dtekchannel02@gmail.com",
+  "phone_number":"0829932992",
   "password":"user123"
 }
 
@@ -14,8 +14,8 @@ POST http://localhost:3000/api/v1/auth/verifyOTP
 Content-Type: application/json
 
 {
-  "email":"jeni.riskaa@gmail.com",
-  "otp": "1T6vrY"
+  "email":"dtekchannel02@gmail.com",
+  "otp": "HeicvG"
 }
 
 
@@ -24,23 +24,32 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email":"jeni.riskaa@gmail.com",
-  "password":"user123"
+  "email":"dtekchannel02@gmail.com",
+  "password":"user12345"
 }
 
 ### forgot password
-POST http://localhost:3000/api/v1/auth/resetPassword
+POST http://localhost:3000/api/v1/auth/forgotPassword
 Content-Type: application/json
 
 {
-    "email": "asd@gmail.com"
+    "email": "dtekchannel02@gmail.com"
+}
+
+### reset password
+POST http://localhost:3000/api/v1/auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6InVzZXJ0ZXN0MDMiLCJlbWFpbCI6ImR0ZWtjaGFubmVsMDJAZ21haWwuY29tIiwiaWF0IjoxNzAxMDk0NDI5LCJleHAiOjE3MDEwOTgwMjl9.-lqAyLC5zzJo__XuvrlIl2zoQidD9gq_F52zz_JKrkc
+Content-Type: application/json
+
+{
+  "password":"user12345",
+  "confirm_password":"user12345"
 }
 
 ### Whoami
 GET http://localhost:3000/api/v1/auth/whoami
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwibmlja25hbWUiOiJ1c2VydGVzdDAyIiwiZW1haWwiOiJqZW5pLnJpc2thYUBnbWFpbC5jb20iLCJpYXQiOjE3MDEwNzQzNzAsImV4cCI6MTcwMTE2MDc3MH0.2qonpyEJofVAli-3qsJdDV5tTUGvDZIFtFFnjxzT7pA
 
-### Login ad,min
+### Login admin
 POST http://localhost:3000/api/v1/auth/admin/login
 Content-Type: application/json
 
