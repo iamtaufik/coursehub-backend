@@ -9,7 +9,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
+  // directUrl = env("DIRECT_DATABASE_URL")
 }
 
 enum Levels {
@@ -33,7 +33,7 @@ model Users {
   email     String    @unique
   password  String
   otp       String?
-  courses   Courses[]
+  courses   Courses[] @relation("UserToCourse")
   profile   Profiles?
   userCourseProgress UserCourseProgress[]
   isVerified Boolean   @default(false)
@@ -73,12 +73,10 @@ model Courses {
   ratings      Int
   author       String
   userCourseProgress UserCourseProgress[]
-  chapter_id   Int
   chapters     Chapters[]
   category_id  Int
   category     Categories @relation(fields: [category_id], references: [id])
-  users_id     Int
-  users        Users      @relation(fields: [users_id], references: [id])
+  users        Users[]    @relation("UserToCourse")
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
@@ -86,7 +84,7 @@ model Courses {
 model Chapters {
   id        Int       @id @default(autoincrement())
   name      String
-  course_id Int
+  course_id Int       
   courses   Courses   @relation(fields: [course_id], references: [id])
   modules   Modules[]
 }

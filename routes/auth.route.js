@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { loginAdmin, register, loginUser, verifyOTP, authenticate, createAdmin } = require('../controllers/auth.controller');
-const verifyToken = require('../libs/verifyToken');
-const verifyAdmin = require('../libs/verifyAdmin');
+const verifyToken = require('../middlewares/verifyToken');
+const verifyAdmin = require('../middlewares/verifyAdmin');
 
 router.get('/', (req, res) => {
   res.send('Hello World! this is development branch');

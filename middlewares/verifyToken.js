@@ -2,6 +2,14 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = process.env;
 
 const verifyToken = (req, res, next) => {
+  if (req.headers.authorization === undefined)
+    return res.status(401).json({
+      success: false,
+      message: 'Unauthorized',
+      err: 'No token provided',
+      data: null,
+    });
+
   const token = req.headers.authorization.split(' ')[1];
 
   if (!token) {
