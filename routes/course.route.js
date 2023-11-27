@@ -1,13 +1,9 @@
 const router = require('express').Router();
-const { createCourse, getCourse,getAllCourse } = require('../controllers/course.controller');
+const { createCourse, getCourses} = require('../controllers/course.controller');
 const verifyToken = require('../middlewares/verifyToken');
 const verifyAdmin = require('../middlewares/verifyAdmin');
 
-router.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-
 router.post('/', verifyToken, verifyAdmin, createCourse);
-router.get('/course', getCourse);
+router.get('/', getCourses);
 
 module.exports = router;
