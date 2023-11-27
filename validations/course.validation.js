@@ -28,7 +28,7 @@ const createCourseSchema = joi.object({
 const getCourseSchema = joi.object({
   level: joi.string().valid('beginner', 'intermediate', 'advanced').allow(''),
   page: joi.number().min(1).optional(), 
-  pageSize: joi.number().min(1).optional(),
+  limit: joi.number().min(1).optional(),
 }).unknown(false);
 
 module.exports = {
