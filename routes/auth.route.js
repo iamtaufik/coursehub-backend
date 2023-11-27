@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { loginAdmin, register, loginUser, verifyOTP, authenticate, createAdmin } = require('../controllers/auth.controller');
+const { loginAdmin, register, loginUser, verifyOTP, authenticate, createAdmin, forgotPassword, resetPassword } = require('../controllers/auth.controller');
 const verifyToken = require('../middlewares/verifyToken');
 const verifyAdmin = require('../middlewares/verifyAdmin');
 
@@ -13,6 +13,8 @@ router.post('/verifyOTP', verifyOTP);
 router.post('/admin/login', loginAdmin);
 router.post('/admin/register', createAdmin);
 router.get('/whoami', verifyToken, authenticate);
+router.post('/forgotPassword', forgotPassword);
+router.post('/reset-password', resetPassword)
 router.get('/admin/whoami', verifyToken, verifyAdmin, authenticate);
 
 module.exports = router;
