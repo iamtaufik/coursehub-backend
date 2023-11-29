@@ -16,6 +16,10 @@ tags:
     description: Operations related to auth Users
   - name: Admin
     description: Operations related to auth Admin
+  - name: Course
+    description: Operations related to Course
+  - name: Category
+    description: Operations related to Category
 paths:
   /auth/register:
     post:
@@ -83,8 +87,61 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/LoginUserModel'
+      
+      
+  /auth/forgotPassword:
+    post:
+      tags:
+        - Users
+      operationId: post-forgotPassword
+      summary: Forgot Password
+      description: Forgot password success,Password reset link successfully sent to email.
+      requestBody:
+            $ref: '#/components/requestBodies/createForgotPassword'
+      responses: 
+        "201":
+          description: Password reset link sent to email successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BasicResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ForgotPasswordModel"
                         
-                        
+  
+  /auth/reset-password:
+    post:
+      tags:
+        - Users
+      operationId: post-reset-password
+      summary: Reset Password
+      description: Enter new password & confirm_password.
+      parameters:
+      - in: query
+        name: token
+        schema:
+          type: string
+        required: true
+        description: Enter the token sent from the email, Token to reset password.
+      requestBody:
+            $ref: '#/components/requestBodies/createResetPassword'
+      responses: 
+        "201":
+          description: Password reset link sent to email successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BasicResponse"
+                  - type: object
+                    properties:
+                      data:
+                        $ref: "#/components/schemas/ResetPasswordModel"
+  
+
   /auth/whoami:
     get:
       tags:
@@ -189,9 +246,73 @@ paths:
       security:
       - bearerAuth: []    
         
-
-
-
+        
+        
+  /courses:
+    post:
+      tags:
+        - Course
+      operationId: post-courses
+      summary: Create New Course
+      description: Create Data Course
+      requestBody:
+            $ref: '#/components/requestBodies/createCourse'
+      responses: 
+        "201":
+          description: Course created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CourseModel'
+                        
+      security:
+      - bearerAuth: []  
+      
+      
+      
+    get:
+        tags:
+          - Course
+        operationId: get-fetch-all-course
+        summary: Get all Course
+        description: Retrieves a list of all registered course.
+        parameters:
+          - in: query
+            name: page
+            schema:
+              type: integer
+            required: false
+            description: Page number for pagination.
+          - in: query
+            name: limit
+            schema:
+              type: integer
+            required: false
+            description: Number of items per page.
+        responses:
+          "200":
+            description: Courses retrieved successfully!
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - $ref: "#/components/schemas/BasicResponse"
+                    - type: object
+                      properties:
+                        data:
+                          type: object
+                          properties:
+                            courses:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/CourseModel"
+                            pagination:
+                              $ref: "#/components/schemas/Pagination"
 
 
 
@@ -322,6 +443,76 @@ components:
           type: string
           example: "admin123"
           
+    ForgotPasswordModel:
+      title: Forgot Password
+      type: object
+      properties:
+        email:
+          type: string
+          example: "usertest01@gmail.com"
+          
+    ResetPasswordModel:
+      title: Reset Password
+      type: object
+      properties:
+        password:
+          type: string
+          example: "user123"
+        confirm_password:
+          type: string
+          example: "user123"
+          
+          
+    CourseModel:
+      title: Course
+      type: object
+      properties:
+        title:
+          type: string
+          example: "course beginner 1"
+        description:
+          type: string
+          example: "beginner 1"
+        image:
+          type: string
+          example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
+        requirement:
+          type: string
+          example: "Requirement 11"
+        level: 
+          type: string
+          example: "beginner"
+        price:
+          type: integer
+          example: 150000
+        ratings:
+          type: string
+          example: "4"
+        author:  
+          type: string
+          example: "CourseHub"
+        category_id:
+          type: integer
+          example: 1
+      
+          
+    Pagination:
+      title: Pagination
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              example: "https://domain.com/users?page=3&limit=10"
+            prev:
+              type: string
+              example: "https://domain.com/users?page=1&limit=10"
+        total_items:
+          type: integer
+          example: 100
+          
           
   requestBodies:
       createRegister:
@@ -396,4 +587,99 @@ components:
                 password:
                   type: string
                   example: "admin123"
-  
+                  
+                  
+      createForgotPassword:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "usertest01@gmail.com"
+                  
+                  
+      createResetPassword:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: "user123"
+                confirm_password:
+                  type: string
+                  example: "user123"
+                  
+      createToken:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                token=:
+                  type: string
+                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6InVzZXJ0ZXN0MDMiLCJlbWFpbCI6ImR0ZWtjaGFubmVsMDJAZ21haWwuY29tIiwiaWF0IjoxNzAxMjI3OTg1LCJleHAiOjE3MDEyMzE1ODV9.eHsIjd04W9GHopVmhbrSE9q9zc3lvMU8FJF_bg8F5LI"
+                  
+                  
+      createCourse:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "course beginner 1"
+                description:
+                  type: string
+                  example: "Description beginner 1"
+                image:
+                  type: string
+                  example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
+                price:
+                  type: integer
+                  example: 150000
+                author:
+                  type: string
+                  example: "CourseHub"
+                level:
+                  type: string
+                  example: "beginner"
+                category_id:
+                  type: integer
+                  example: "1"
+                requirements:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - "Persyaratan 1"
+                    - "Persyaratan 2"
+                    - "Persyaratan 3"
+                chapters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "Chapter 1"
+                      modules:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                              example: "Module 1"
+                            duration:
+                              type: integer
+                              example: 60
+                            url:
+                              type: string
+                              format: uri
+                              example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
+                           
