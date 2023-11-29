@@ -1,4 +1,5 @@
 const prisma = require('../libs/prisma');
+const { getCategoriesSchema } = require('../validations/category.validation');
 
 const getCategories = async (req, res, next) => {
   try {
@@ -17,6 +18,8 @@ const getCategories = async (req, res, next) => {
 const getCourseByCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
+
+    await getCategoriesSchema.validateAsync(req.params);
 
     const { courses } = await prisma.categories.findUnique({
       where: {

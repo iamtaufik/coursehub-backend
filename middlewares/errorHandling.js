@@ -7,6 +7,14 @@ const notFound = (req, res, next) => {
 };
 
 const serverError = (err, req, res, next) => {
+  if (err.isJoi) {
+    return res.status(400).json({
+      status: 'Error',
+      message: err.name,
+      error: err.message,
+    });
+  }
+
   if (err) {
     res.status(500).json({
       success: false,
@@ -14,8 +22,6 @@ const serverError = (err, req, res, next) => {
       data: null,
     });
   }
-
-  next();
 };
 
 module.exports = {
