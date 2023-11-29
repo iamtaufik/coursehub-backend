@@ -47,21 +47,21 @@ Content-Type: application/json
 
 ### Whoami
 GET http://localhost:3000/api/v1/auth/whoami
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwibmlja25hbWUiOiJ1c2VydGVzdDAyIiwiZW1haWwiOiJqZW5pLnJpc2thYUBnbWFpbC5jb20iLCJpYXQiOjE3MDEwNzQzNzAsImV4cCI6MTcwMTE2MDc3MH0.2qonpyEJofVAli-3qsJdDV5tTUGvDZIFtFFnjxzT7pA
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDEyMzI4MzAsImV4cCI6MTcwMTMxOTIzMH0.IC-DZjXAhQm-RoRVzkHlb8K3sm4TS3TsasQL65HtPK0
 
 ### Login admin
 POST http://localhost:3000/api/v1/auth/admin/login
 Content-Type: application/json
 
 {
-  "idAdmin":"admin-course-hubb@gmail.com",
+  "idAdmin":"admin-course-hub",
   "password":"admin123"
 }
 
 ###
 POST http://localhost:3000/api/v1/courses
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWJiQGdtYWlsLmNvbSIsImlhdCI6MTcwMTA3NDU3MCwiZXhwIjoxNzAxMTYwOTcwfQ.ylBls4v8lShsN-Yt22bcBJfunhg-MFmEsGHr9nkqkPI
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDEyMzI4MzAsImV4cCI6MTcwMTMxOTIzMH0.IC-DZjXAhQm-RoRVzkHlb8K3sm4TS3TsasQL65HtPK0
 
 {
   "title": "course beginner 11",
@@ -70,7 +70,7 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWRBZG1pb
   "price": 99,
   "author": "CourseHub",
   "level": "beginner",
-  "category_id": 6,
+  "category_id": 1,
   "requirements": ["Requirement 11", "Requirement 2","Requirement 99"],
   "chapters": [
     {
@@ -102,6 +102,13 @@ Content-Type: application/json
 ###
 GET http://localhost:3000/api/v1/courses?level=beginner&page=2&pageSize=10
 Content-Type: application/json
-###
+
+### get all course
 GET http://localhost:3000/api/v1/courses
 Content-Type: application/json
+
+### get course with pagination
+GET http://localhost:3000/api/v1/courses?page1&limit=10
+Content-Type: application/json
+
+
