@@ -313,6 +313,55 @@ paths:
                                 $ref: "#/components/schemas/CourseModel"
                             pagination:
                               $ref: "#/components/schemas/Pagination"
+                              
+                              
+  /categories:
+    get:
+        tags:
+          - Category
+        operationId: get-fetch-all-category
+        summary: Get all Category
+        description: Retrieves a list of all registered category.
+        responses:
+          "200":
+            description: Courses retrieved successfully!
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - $ref: "#/components/schemas/BasicResponse"
+                    - type: object
+                      properties:
+                        data:
+                          type: object
+                    
+        
+  /categories/:{id}:                  
+    get:
+        tags:
+          - Category
+        operationId: get-all-courseByCategory
+        summary: Get all Category
+        description: Retrieves a list of all Course by Category.
+        responses:
+          "200":
+            description: Courses retrieved successfully!
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - $ref: "#/components/schemas/BasicResponse"
+                    - type: object
+                      properties:
+                        data:
+                          type: object
+                          properties:
+                            courses:
+                              type: array
+                              items:
+                                $ref: "#/components/schemas/CourseModel"
+                            pagination:
+                              $ref: "#/components/schemas/Pagination"
 
 
 

@@ -112,3 +112,5 @@ GET http://localhost:3000/api/v1/courses?page1&limit=10
 Content-Type: application/json
 
 
+### get detail courses
+GET http://localhost:3000/api/v1/courses/1
