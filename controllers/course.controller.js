@@ -86,7 +86,63 @@ const getCourses = async (req, res, next) => {
       });
     }
 
-    if (req.query.level || req.category || req.query.filter) {
+    if (req.query.category) {
+      const { category } = req.query;
+      const courses = await prisma.courses.findMany({
+        where: {
+          category: {
+            name_categories: typeof category === 'string' ? { in: [category] } : { in: [...category] },
+          },
+          AND: { isDeleted: false },
+        },
+      });
+
+      return res.status(200).json({
+        status: true,
+        message: 'Courses retrieved successfully',
+        data: courses,
+      });
+    }
+
+    if (req.query.level) {
+      const { level } = req.query;
+      const courses = await prisma.courses.findMany({
+        where: {
+          level: {
+            in: [level],
+          },
+          AND: { isDeleted: false },
+        },
+      });
+
+      return res.json({
+        status: true,
+        message: 'Courses retrieved successfully',
+        data: courses,
+      });
+    }
+
+    if (req.query.filter) {
+      const { filter } = req.query;
+      const filterOptions = {
+        populer: { orderBy: { ratings: 'desc' } },
+        terbaru: { orderBy: { createdAt: 'desc' } },
+      };
+
+      const courses = await prisma.courses.findMany({
+        ...filterOptions[filter],
+        where: {
+          isDeleted: false,
+        },
+      });
+      return res.json({
+        status: true,
+        message: 'Courses retrieved successfully',
+        data: courses,
+      });
+    }
+
+    if (req.query.level && req.category && req.query.filter) {
       const { level, category, fillter } = req.query;
 
       const filterOptions = {
@@ -110,7 +166,7 @@ const getCourses = async (req, res, next) => {
         data: courses,
       });
     }
-    if (req.query.page || req.query.limit) {
+    if (req.query.page && req.query.limit) {
       const { page = 1, limit = 10 } = req.query;
 
       const courses = await prisma.courses.findMany({
