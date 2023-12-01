@@ -38,8 +38,33 @@ const joinCourseSchema = joi.object({
   email: joi.string().email().required(),
 });
 
+const updateCourseSchema = joi.object({
+  title: joi.string(),
+  description: joi.string(),
+  image: joi.string(),
+  price: joi.number(),
+  requirements: joi.array().items(joi.string()),
+  level: joi.string().valid('beginner', 'intermediate', 'advanced'),
+  author: joi.string(),
+  chapters: joi
+    .array()
+    .items(
+      joi.object({
+        name: joi.string().required(),
+        modules: joi.array().items(
+          joi.object({
+            title: joi.string().required(),
+            duration: joi.number().required(),
+            url: joi.string().required(),
+          })
+        ),
+      })
+    ),
+});
+
 module.exports = {
   createCourseSchema,
   getCourseSchema,
   joinCourseSchema,
+  updateCourseSchema
 };
