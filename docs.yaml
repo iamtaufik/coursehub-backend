@@ -315,6 +315,95 @@ paths:
                               $ref: "#/components/schemas/Pagination"
                               
                               
+  "/courses/{id}":                  
+    get:
+      tags:
+        - Course
+      operationId: get-detail-course
+      summary: Get Detail Course
+      description: Retrieves a list of detail courses.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      responses:
+          "200":
+            description: Courses retrieved successfully!
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - $ref: "#/components/schemas/BasicResponse"
+                    - type: object
+                      properties:
+                        data:
+                          $ref: "#/components/schemas/CourseModel"
+                          
+                          
+                          
+    put:
+      tags:
+        - Course
+      operationId: put-update-course
+      summary: Update course details
+      description: Updates details of a specific course.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the course to update.
+      requestBody:
+        $ref: '#/components/requestBodies/updateCourse'
+      responses:
+        "200":
+          description: Course updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BasicResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        
+      security:
+      - bearerAuth: [] 
+      
+                        
+    delete:
+      tags:
+        - Course
+      operationId: delete-remove-users
+      summary: Delete users
+      description: Deletes a specific users.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the user to delete.
+      responses:
+        "200":
+          description: Successful users deletion
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BasicResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+                              
+                              
   /categories:
     get:
         tags:
@@ -336,13 +425,20 @@ paths:
                           type: object
                     
         
-  /categories/:{id}:                  
+  "/categories/{id}":                  
     get:
         tags:
           - Category
         operationId: get-all-courseByCategory
-        summary: Get all Category
+        summary: Get Course by Category
         description: Retrieves a list of all Course by Category.
+        parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course by Category to retrieve.
         responses:
           "200":
             description: Courses retrieved successfully!
@@ -354,14 +450,7 @@ paths:
                     - type: object
                       properties:
                         data:
-                          type: object
-                          properties:
-                            courses:
-                              type: array
-                              items:
-                                $ref: "#/components/schemas/CourseModel"
-                            pagination:
-                              $ref: "#/components/schemas/Pagination"
+                          $ref: "#/components/schemas/CourseModel"
 
 
 
@@ -581,7 +670,7 @@ components:
                   example: "089627188292"
                 password:
                   type: string
-                  example: "usertest123"
+                  example: "***********"
                   
       createOtp:
         content:
@@ -608,7 +697,7 @@ components:
                     example: "usertest01@gmail.com"
                   password:
                     type: string
-                    example: "usertest123"
+                    example: "***********"
                     
       createLoginAdmin:
           content:
@@ -621,7 +710,7 @@ components:
                     example: "admin-course-hub"
                   password:
                     type: string
-                    example: "admin123"
+                    example: "***********"
                     
                     
       createAdmin:
@@ -635,7 +724,7 @@ components:
                   example: "admin-course-hub"
                 password:
                   type: string
-                  example: "admin123"
+                  example: "***********"
                   
                   
       createForgotPassword:
@@ -657,10 +746,10 @@ components:
               properties:
                 password:
                   type: string
-                  example: "user123"
+                  example: "***********"
                 confirm_password:
                   type: string
-                  example: "user123"
+                  example: "***********"
                   
       createToken:
         content:
@@ -674,6 +763,66 @@ components:
                   
                   
       createCourse:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "course beginner 1"
+                description:
+                  type: string
+                  example: "Description beginner 1"
+                image:
+                  type: string
+                  example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
+                price:
+                  type: integer
+                  example: 150000
+                author:
+                  type: string
+                  example: "CourseHub"
+                level:
+                  type: string
+                  example: "beginner"
+                category_id:
+                  type: integer
+                  example: "1"
+                requirements:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - "Persyaratan 1"
+                    - "Persyaratan 2"
+                    - "Persyaratan 3"
+                chapters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                        example: "Chapter 1"
+                      modules:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                              example: "Module 1"
+                            duration:
+                              type: integer
+                              example: 60
+                            url:
+                              type: string
+                              format: uri
+                              example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
+                              
+      
+      updateCourse:
         content:
           application/json:
             schema:
