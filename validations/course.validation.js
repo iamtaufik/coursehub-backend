@@ -25,11 +25,18 @@ const createCourseSchema = joi.object({
     )
     .required(),
 });
-const getCourseSchema = joi.object({
-  level: joi.string().valid('beginner', 'intermediate', 'advanced').allow(''),
-  page: joi.number().min(1).optional(), 
-  limit: joi.number().min(1).optional(),
-}).unknown(false);
+const getCourseSchema = joi
+  .object({
+    level: joi.string().valid('beginner', 'intermediate', 'advanced').allow(''),
+    page: joi.number().min(1).optional(),
+    limit: joi.number().min(1).optional(),
+  })
+  .unknown(false);
+
+const joinCourseSchema = joi.object({
+  id: joi.number().required(),
+  email: joi.string().email().required(),
+});
 
 const updateCourseSchema = joi.object({
   title: joi.string(),
@@ -58,5 +65,6 @@ const updateCourseSchema = joi.object({
 module.exports = {
   createCourseSchema,
   getCourseSchema,
+  joinCourseSchema,
   updateCourseSchema
 };
