@@ -54,27 +54,30 @@ POST http://localhost:3000/api/v1/auth/admin/login
 Content-Type: application/json
 
 {
-  "idAdmin":"admin-course-hub",
+  "idAdmin":"admin-course-hubb@gmail.com",
   "password":"admin123"
 }
 
 ###
 POST http://localhost:3000/api/v1/courses
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDEyMzI4MzAsImV4cCI6MTcwMTMxOTIzMH0.IC-DZjXAhQm-RoRVzkHlb8K3sm4TS3TsasQL65HtPK0
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWJiQGdtYWlsLmNvbSIsImlhdCI6MTcwMTI2NTgwMiwiZXhwIjoxNzAxMzUyMjAyfQ.mfqgNMidKI3o83qNDCXLSoj1GUd450vliVCfmapeQVo
 
 {
-  "title": "course beginner 11",
-  "description": "beginner 11",
-  "image": "https://youtu.be/kWT1uGvhWp8?feature=shared",
-  "price": 99,
+  "title": "NEXTJS lvl 1",
+  "description": "Belajar NEXTJS paling gampang",
+  "image": " ",
+  "price": 999999,
   "author": "CourseHub",
   "level": "beginner",
-  "category_id": 1,
-  "requirements": ["Requirement 11", "Requirement 2","Requirement 99"],
+  "category_id": 2,
+  "requirements":  [
+          "React Dasar",
+          "Express"
+        ],
   "chapters": [
     {
-      "name": "Chapter 999",
+      "name": "Chapter selanjutnya",
       "modules": [
         {
           "title": "Module 1",
@@ -92,15 +95,15 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pb
 }
 
 ###
-GET http://localhost:3000/api/v1/courses/course?level=beginner
+GET http://localhost:3000/api/v1/courses?levels=beginner
 Content-Type: application/json
 
 ###
-GET http://localhost:3000/api/v1/courses/course
+GET http://localhost:3000/api/v1/courses
 Content-Type: application/json
 
 ###
-GET http://localhost:3000/api/v1/courses?level=beginner&page=2&pageSize=10
+GET http://localhost:3000/api/v1/courses?levels=beginner&page=2&pageSize=10
 Content-Type: application/json
 
 ### get all course
@@ -112,3 +115,56 @@ GET http://localhost:3000/api/v1/courses?page1&limit=10
 Content-Type: application/json
 
 
+### get detail courses
+GET http://localhost:3000/api/v1/courses/1
+=======
+
+###
+GET http://localhost:3000/api/v1/courses
+Content-Type: application/json
+
+
+###
+PUT http://localhost:3000/api/v1/courses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0MzAyNzUsImV4cCI6MTcwMTUxNjY3NX0.1MT9lM1xupj_H8ZL5JIAq-JLjJwuF9w4GIfamNPXag0
+
+{
+  "title": "NEXTJS lvl 1 ",
+  "description": "updated",
+  "price": 100,
+  "image": "https://google.com",
+  "requirements": [
+        "React Dasar",
+        "Express"
+      ],
+  "author": "coursehubh",
+  "level": "intermediate",
+  "chapters": [
+    {
+      "name": "Chapter 1",
+      "modules": [
+        {
+          "title": "Module 1",
+          "duration": 10,
+          "url": "https://google.com"
+        },
+        {
+          "title": "Module 2",
+          "duration": 15,
+          "url": "https://google.com"
+        }
+      ]
+    },
+    {
+      "name": "Chapter 2",
+      "modules": [
+        {
+          "title": "Module 3",
+          "duration": 20,
+          "url": "https://google.com"
+        }
+      ]
+    }
+  ]
+}
