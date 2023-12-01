@@ -294,6 +294,30 @@ paths:
               type: integer
             required: false
             description: Number of items per page.
+          - in: query
+            name: search
+            schema:
+              type: string
+            required: false
+            description: Search by course title.
+          - in: query
+            name: sort
+            schema:
+              type: string
+            required: false
+            description: Sort course.
+          - in: query
+            name: level
+            schema:
+              type: string
+            required: false
+            description: Filter by level.
+          - in: query
+            name: category
+            schema:
+              type: string
+            required: false
+            description: Filter by category.
         responses:
           "200":
             description: Courses retrieved successfully!
