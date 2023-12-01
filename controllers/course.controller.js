@@ -147,7 +147,42 @@ const getCourses = async (req, res, next) => {
   }
 };
 
+const deleteCourse = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    const getCourses = await prisma.courses.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    if (!getCourses) {
+      return res.status(404).json({
+        status: false,
+        message: 'Course not found',
+        data: null,
+      });
+    }
+
+    await prisma.courses.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    res.status(200).json({
+      status: true,
+      message: 'Course deleted successfully',
+      data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createCourse,
   getCourses,
+  deleteCourse,
 };
