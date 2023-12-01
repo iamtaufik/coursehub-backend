@@ -125,9 +125,9 @@ Content-Type: application/json
 
 
 ###
-PUT http://localhost:3000/api/v1/courses/2
+PUT http://localhost:3000/api/v1/courses/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWJiQGdtYWlsLmNvbSIsImlhdCI6MTcwMTI2NTgwMiwiZXhwIjoxNzAxMzUyMjAyfQ.mfqgNMidKI3o83qNDCXLSoj1GUd450vliVCfmapeQVo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0MzAyNzUsImV4cCI6MTcwMTUxNjY3NX0.1MT9lM1xupj_H8ZL5JIAq-JLjJwuF9w4GIfamNPXag0
 
 {
   "title": "NEXTJS lvl 1 ",
