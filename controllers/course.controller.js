@@ -102,7 +102,7 @@ const getCourses = async (req, res, next) => {
           ...(level && { level })
         },
 
-        
+
       });
 
       return res.status(200).json({
@@ -262,9 +262,43 @@ const deleteCourse = async (req, res, next) => {
 };
 }
 
+
+const getDetailCourses = async (req, res, next) => {
+  try {
+    let { id } = req.params;
+    let course = await prisma.courses.findUnique({
+      where: { id: Number(id) },
+      include: {
+        chapters: {
+          include: {
+            modules: true
+          }
+        }
+      }
+    });
+
+    if (!course) {
+      return res.status(400).json({
+        status: false,
+        message: 'Bad Request',
+        data: 'Courses data not found with Id ' + id
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: 'Detail Courses!',
+      data: course
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createCourse,
   getCourses,
+  getDetailCourses
   updateCourse,
   deleteCourse,
 };
