@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 
@@ -76,6 +77,7 @@ model Courses {
   category_id  Int
   category     Categories @relation(fields: [category_id], references: [id])
   users        Users[]    @relation("UserToCourse")
+  isDeleted    Boolean    @default(false)
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
