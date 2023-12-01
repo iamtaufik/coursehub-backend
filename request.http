@@ -1,883 +1,170 @@
-openapi: 3.0.0
-info:
-  title: Docs API Backend Coursehub
-  description: Documentasi API untuk autentikasi pengguna (berbasis Token)
-  version: 1.0.0
-  contact:
-    name: CourseHub
-    email: CourseHubreal@gmail.com
-servers:
-  - url: http://localhost:3000/api/v1
-  - url: https://backend_coursehub.test/api/v1
-  - url: https://coursehub-development.vercel.app/api/v1
-  - url: https://coursehub-production.vercel.app/api/v1
-tags:
-  - name: Users
-    description: Operations related to auth Users
-  - name: Admin
-    description: Operations related to auth Admin
-  - name: Course
-    description: Operations related to Course
-  - name: Category
-    description: Operations related to Category
-paths:
-  /auth/register:
-    post:
-      tags: 
-      - Users
-      operationId: post-create-register
-      summary: Register new users
-      description: Successful account registration, check the account activation otp code in your email
-      requestBody:
-            $ref: '#/components/requestBodies/createRegister'
-      responses: 
-        "201":
-          description: Succesfull Register!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/RegisterModel'
-                        
-  /auth/verifyOTP:
-    post:
-      tags:
-      - Users
-      operationId: post-verify-otp
-      summary: Verify OTP (OTP Aktivasi)
-      description: Verify otp after account registration
-      requestBody:
-            $ref: '#/components/requestBodies/createOtp'
-      responses: 
-        "201":
-          description: Account activated successfully!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/VerifyOtpModel'
-                        
-                        
-  /auth/login:
-    post:
-      tags: 
-      - Users
-      operationId: post-login-users
-      summary: Login Users
-      description: Users account login
-      requestBody:
-            $ref: '#/components/requestBodies/createLoginUsers'
-      responses: 
-        "201":
-          description: Login success!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/LoginUserModel'
-      
-      
-  /auth/forgotPassword:
-    post:
-      tags:
-        - Users
-      operationId: post-forgotPassword
-      summary: Forgot Password
-      description: Forgot password success,Password reset link successfully sent to email.
-      requestBody:
-            $ref: '#/components/requestBodies/createForgotPassword'
-      responses: 
-        "201":
-          description: Password reset link sent to email successfully!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/BasicResponse"
-                  - type: object
-                    properties:
-                      data:
-                        $ref: "#/components/schemas/ForgotPasswordModel"
-                        
-  
-  /auth/reset-password:
-    post:
-      tags:
-        - Users
-      operationId: post-reset-password
-      summary: Reset Password
-      description: Enter new password & confirm_password.
-      parameters:
-      - in: query
-        name: token
-        schema:
-          type: string
-        required: true
-        description: Enter the token sent from the email, Token to reset password.
-      requestBody:
-            $ref: '#/components/requestBodies/createResetPassword'
-      responses: 
-        "201":
-          description: Password reset link sent to email successfully!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/BasicResponse"
-                  - type: object
-                    properties:
-                      data:
-                        $ref: "#/components/schemas/ResetPasswordModel"
-  
+### register
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
 
-  /auth/whoami:
-    get:
-      tags:
-        - Users
-      operationId: get-fetch-whoami
-      summary: Get Whoami
-      description: Retrieves details of a specific users.
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/BasicResponse"
-                  - type: object
-                    properties:
-                      data:
-                        $ref: "#/components/schemas/WhoamiModel"
-                        
-      security:
-      - bearerAuth: []
-                        
-                        
-                        
-  /auth/admin/register:
-    post:
-      tags: 
-      - Admin
-      operationId: post-create-admin
-      summary: Register new Admin
-      description: Register new admin
-      requestBody:
-            $ref: '#/components/requestBodies/createAdmin'
-      responses: 
-        "201":
-          description: Succesfull Create Admin!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/AdminModel'
-                        
-                        
-  /auth/admin/login:
-    post:
-      tags: 
-      - Admin
-      operationId: post-login-admin
-      summary: Login Admin
-      description: Admin account login
-      requestBody:
-            $ref: '#/components/requestBodies/createLoginAdmin'
-      responses: 
-        "201":
-          description: Login success!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/LoginAdminModel'
-                        
-  /auth/admin/whoami:
-    get:
-      tags:
-        - Admin
-      operationId: get-fetch-whoami-admin
-      summary: Get Whoami Admin
-      description: Retrieves details of a specific admin.
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/BasicResponse"
-                  - type: object
-                    properties:
-                      data:
-                        $ref: "#/components/schemas/WhoamiModel"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/BasicResponse"
-                  - type: object
-                    properties:
-                      data:
-                        type: string
-                        example: Unauthorized                
-      security:
-      - bearerAuth: []    
-        
-        
-        
-  /courses:
-    post:
-      tags:
-        - Course
-      operationId: post-courses
-      summary: Create New Course
-      description: Create Data Course
-      requestBody:
-            $ref: '#/components/requestBodies/createCourse'
-      responses: 
-        "201":
-          description: Course created successfully!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/CourseModel'
-                        
-      security:
-      - bearerAuth: []  
-      
-      
-      
-    get:
-        tags:
-          - Course
-        operationId: get-fetch-all-course
-        summary: Get all Course
-        description: Retrieves a list of all registered course.
-        parameters:
-          - in: query
-            name: page
-            schema:
-              type: integer
-            required: false
-            description: Page number for pagination.
-          - in: query
-            name: limit
-            schema:
-              type: integer
-            required: false
-            description: Number of items per page.
-        responses:
-          "200":
-            description: Courses retrieved successfully!
-            content:
-              application/json:
-                schema:
-                  allOf:
-                    - $ref: "#/components/schemas/BasicResponse"
-                    - type: object
-                      properties:
-                        data:
-                          type: object
-                          properties:
-                            courses:
-                              type: array
-                              items:
-                                $ref: "#/components/schemas/CourseModel"
-                            pagination:
-                              $ref: "#/components/schemas/Pagination"
-                              
-                              
-  "/courses/{id}":                  
-    get:
-      tags:
-        - Course
-      operationId: get-detail-course
-      summary: Get Detail Course
-      description: Retrieves a list of detail courses.
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: The ID of the Course to retrieve.
-      responses:
-          "200":
-            description: Courses retrieved successfully!
-            content:
-              application/json:
-                schema:
-                  allOf:
-                    - $ref: "#/components/schemas/BasicResponse"
-                    - type: object
-                      properties:
-                        data:
-                          $ref: "#/components/schemas/CourseModel"
-                          
-                          
-                          
-    put:
-      tags:
-        - Course
-      operationId: put-update-course
-      summary: Update course details
-      description: Updates details of a specific course.
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: The ID of the course to update.
-      requestBody:
-        $ref: '#/components/requestBodies/updateCourse'
-      responses:
-        "200":
-          description: Course updated successfully!
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/BasicResponse"
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        
-      security:
-      - bearerAuth: [] 
-      
-                        
-    delete:
-      tags:
-        - Course
-      operationId: delete-remove-users
-      summary: Delete users
-      description: Deletes a specific users.
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: The ID of the user to delete.
-      responses:
-        "200":
-          description: Successful users deletion
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/BasicResponse"
-                  - type: object
-                    properties:
-                      data:
-                        type: object
-                        example: null
-                              
-                              
-  /categories:
-    get:
-        tags:
-          - Category
-        operationId: get-fetch-all-category
-        summary: Get all Category
-        description: Retrieves a list of all registered category.
-        responses:
-          "200":
-            description: Courses retrieved successfully!
-            content:
-              application/json:
-                schema:
-                  allOf:
-                    - $ref: "#/components/schemas/BasicResponse"
-                    - type: object
-                      properties:
-                        data:
-                          type: object
-                    
-        
-  "/categories/{id}":                  
-    get:
-        tags:
-          - Category
-        operationId: get-all-courseByCategory
-        summary: Get Course by Category
-        description: Retrieves a list of all Course by Category.
-        parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          required: true
-          description: The ID of the Course by Category to retrieve.
-        responses:
-          "200":
-            description: Courses retrieved successfully!
-            content:
-              application/json:
-                schema:
-                  allOf:
-                    - $ref: "#/components/schemas/BasicResponse"
-                    - type: object
-                      properties:
-                        data:
-                          $ref: "#/components/schemas/CourseModel"
+{
+  "nickname":"usertest03",
+  "email":"dtekchannel02@gmail.com",
+  "phone_number":"0829932992",
+  "password":"user123"
+}
+
+### OTP
+POST http://localhost:3000/api/v1/auth/verifyOTP
+Content-Type: application/json
+
+{
+  "email":"dtekchannel02@gmail.com",
+  "otp": "HeicvG"
+}
 
 
+### Login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email":"dtekchannel02@gmail.com",
+  "password":"user12345"
+}
+
+### forgot password
+POST http://localhost:3000/api/v1/auth/forgotPassword
+Content-Type: application/json
+
+{
+    "email": "dtekchannel02@gmail.com"
+}
+
+### reset password
+POST http://localhost:3000/api/v1/auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6InVzZXJ0ZXN0MDMiLCJlbWFpbCI6ImR0ZWtjaGFubmVsMDJAZ21haWwuY29tIiwiaWF0IjoxNzAxMDk0NDI5LCJleHAiOjE3MDEwOTgwMjl9.-lqAyLC5zzJo__XuvrlIl2zoQidD9gq_F52zz_JKrkc
+Content-Type: application/json
+
+{
+  "password":"user12345",
+  "confirm_password":"user12345"
+}
+
+### Whoami
+GET http://localhost:3000/api/v1/auth/whoami
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDEyMzI4MzAsImV4cCI6MTcwMTMxOTIzMH0.IC-DZjXAhQm-RoRVzkHlb8K3sm4TS3TsasQL65HtPK0
+
+### Login admin
+POST http://localhost:3000/api/v1/auth/admin/login
+Content-Type: application/json
+
+{
+  "idAdmin":"admin-course-hubb@gmail.com",
+  "password":"admin123"
+}
+
+###
+POST http://localhost:3000/api/v1/courses
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0MzQzNzgsImV4cCI6MTcwMTUyMDc3OH0.K9oXu3Cz9JqyzZe8u-sBHb3UEpKCAwUQjy73rrCBxyU
+
+{
+  "title": "NEXTJS lvl 1",
+  "description": "Belajar NEXTJS paling gampang",
+  "image": " ",
+  "price": 999999,
+  "author": "CourseHub",
+  "level": "beginner",
+  "category_id": 2,
+  "requirements":  [
+          "React Dasar",
+          "Express"
+        ],
+  "chapters": [
+    {
+      "name": "Chapter selanjutnya",
+      "modules": [
+        {
+          "title": "Module 1",
+          "duration": 60,
+          "url": "https://youtu.be/kWT1uGvhWp8?feature=shared"
+        },
+        {
+          "title": "Module 2",
+          "duration": 45,
+          "url": "https://youtu.be/kWT1uGvhWp8?feature=shared"
+        }
+      ]
+    }
+  ]
+}
+
+###
+GET http://localhost:3000/api/v1/courses?levels=beginner
+Content-Type: application/json
+
+###
+GET http://localhost:3000/api/v1/courses
+Content-Type: application/json
+
+###
+GET http://localhost:3000/api/v1/courses?levels=beginner&page=2&pageSize=10
+Content-Type: application/json
+
+### get all course
+GET http://localhost:3000/api/v1/courses
+Content-Type: application/json
+
+### get course with pagination
+GET http://localhost:3000/api/v1/courses?page1&limit=10
+Content-Type: application/json
 
 
-components:
-  securitySchemes:
-    bearerAuth:            # arbitrary name for the security scheme
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+### get detail courses
+GET http://localhost:3000/api/v1/courses/1
+=======
+
+###
+GET http://localhost:3000/api/v1/courses
+Content-Type: application/json
 
 
-  schemas:
-    BasicResponse:
-      title: BasicResponse
-      type: object
-      properties:
-        status:
-          type: boolean
-          example: true
-        message:
-          type: string
-          example: "OK"
-          
-    RegisterModel:
-      title: Register
-      type: object
-      properties:
-        nickname:
-          type: string
-          example: "test01"
-        email:
-          type: string
-          example: "test_dev@gmail.com"
-        phone_number:
-          type: string
-          example: 0898829918291
-        password:
-          type: string
-          example: "test123"
-          
-    VerifyOtpModel:
-      title: verifyOTP
-      type: object
-      properties:
-        null:
-          type: string
-          example: 
-     
-   
-    LoginUserModel:
-      title: Login Users
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        nickname:
-          type: string
-          example: "usertest02"
-        email:
-          type: string
-          example: "usertest03@gmail.com"
-        otp:
-          type: string
-          example: "null"
-        isVerified:
-          type: string
-          example: "true"
-          
-    WhoamiModel:
-      title: Whoami Users & Admin
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        nickname:
-          type: string
-          example: "usertest02"
-        email:
-          type: string
-          example: "usertest03@gmail.com"
-        iat:
-          type: integer
-          example: 1700840557
-        exp:
-          type: integer
-          example: 1700926957
-          
-    LoginAdminModel:
-      title: Login Admin
-      type: object
-      properties:
-        data:
-          type: string
-          example: "yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWJAZ21haWwuY29tIiwiaWF0IjoxNzAwODQxNjUyLCJleHAiOjE3MDA5MjgwNTJ9.Xj7FsT6aPtXTZISozyYp8oKABQ8eyLSh0JJBeD2g"
-          
-    
-    UsersModel:
-      title: Users
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        nickname:
-          type: string
-          example: "test"
-        email:
-          type: string
-          example: "test_dev@gmail.com"
-        password:
-          type: string
-          example: "test_dev020102"
-          
-    AdminModel:
-      title: Admin
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-        idAdmin:
-          type: string
-          example: "admin-course-hub"
-        password:
-          type: string
-          example: "admin123"
-          
-    ForgotPasswordModel:
-      title: Forgot Password
-      type: object
-      properties:
-        email:
-          type: string
-          example: "usertest01@gmail.com"
-          
-    ResetPasswordModel:
-      title: Reset Password
-      type: object
-      properties:
-        password:
-          type: string
-          example: "user123"
-        confirm_password:
-          type: string
-          example: "user123"
-          
-          
-    CourseModel:
-      title: Course
-      type: object
-      properties:
-        title:
-          type: string
-          example: "course beginner 1"
-        description:
-          type: string
-          example: "beginner 1"
-        image:
-          type: string
-          example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
-        requirement:
-          type: string
-          example: "Requirement 11"
-        level: 
-          type: string
-          example: "beginner"
-        price:
-          type: integer
-          example: 150000
-        ratings:
-          type: string
-          example: "4"
-        author:  
-          type: string
-          example: "CourseHub"
-        category_id:
-          type: integer
-          example: 1
-      
-          
-    Pagination:
-      title: Pagination
-      type: object
-      properties:
-        links:
-          type: object
-          properties:
-            next:
-              type: string
-              example: "https://domain.com/users?page=3&limit=10"
-            prev:
-              type: string
-              example: "https://domain.com/users?page=1&limit=10"
-        total_items:
-          type: integer
-          example: 100
-          
-          
-  requestBodies:
-      createRegister:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                nickname:
-                  type: string
-                  example: "usertest01"
-                email:
-                  type: string
-                  example: "usertest01@gmail.com"
-                phone_number:
-                  type: string
-                  example: "089627188292"
-                password:
-                  type: string
-                  example: "***********"
-                  
-      createOtp:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  example: "usertest01@gmail.com"
-                otp:
-                  type: string
-                  example: "jpK9oX"
+###
+PUT http://localhost:3000/api/v1/courses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0MzAyNzUsImV4cCI6MTcwMTUxNjY3NX0.1MT9lM1xupj_H8ZL5JIAq-JLjJwuF9w4GIfamNPXag0
 
-                  
-      createLoginUsers:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  email:
-                    type: string
-                    example: "usertest01@gmail.com"
-                  password:
-                    type: string
-                    example: "***********"
-                    
-      createLoginAdmin:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  idAdmin:
-                    type: string
-                    example: "admin-course-hub"
-                  password:
-                    type: string
-                    example: "***********"
-                    
-                    
-      createAdmin:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                idAdmin:
-                  type: string
-                  example: "admin-course-hub"
-                password:
-                  type: string
-                  example: "***********"
-                  
-                  
-      createForgotPassword:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  example: "usertest01@gmail.com"
-                  
-                  
-      createResetPassword:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                password:
-                  type: string
-                  example: "***********"
-                confirm_password:
-                  type: string
-                  example: "***********"
-                  
-      createToken:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                token=:
-                  type: string
-                  example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6InVzZXJ0ZXN0MDMiLCJlbWFpbCI6ImR0ZWtjaGFubmVsMDJAZ21haWwuY29tIiwiaWF0IjoxNzAxMjI3OTg1LCJleHAiOjE3MDEyMzE1ODV9.eHsIjd04W9GHopVmhbrSE9q9zc3lvMU8FJF_bg8F5LI"
-                  
-                  
-      createCourse:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  example: "course beginner 1"
-                description:
-                  type: string
-                  example: "Description beginner 1"
-                image:
-                  type: string
-                  example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
-                price:
-                  type: integer
-                  example: 150000
-                author:
-                  type: string
-                  example: "CourseHub"
-                level:
-                  type: string
-                  example: "beginner"
-                category_id:
-                  type: integer
-                  example: "1"
-                requirements:
-                  type: array
-                  items:
-                    type: string
-                  example:
-                    - "Persyaratan 1"
-                    - "Persyaratan 2"
-                    - "Persyaratan 3"
-                chapters:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        example: "Chapter 1"
-                      modules:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            title:
-                              type: string
-                              example: "Module 1"
-                            duration:
-                              type: integer
-                              example: 60
-                            url:
-                              type: string
-                              format: uri
-                              example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
-                              
-      
-      updateCourse:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                title:
-                  type: string
-                  example: "course beginner 1"
-                description:
-                  type: string
-                  example: "Description beginner 1"
-                image:
-                  type: string
-                  example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
-                price:
-                  type: integer
-                  example: 150000
-                author:
-                  type: string
-                  example: "CourseHub"
-                level:
-                  type: string
-                  example: "beginner"
-                category_id:
-                  type: integer
-                  example: "1"
-                requirements:
-                  type: array
-                  items:
-                    type: string
-                  example:
-                    - "Persyaratan 1"
-                    - "Persyaratan 2"
-                    - "Persyaratan 3"
-                chapters:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                        example: "Chapter 1"
-                      modules:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            title:
-                              type: string
-                              example: "Module 1"
-                            duration:
-                              type: integer
-                              example: 60
-                            url:
-                              type: string
-                              format: uri
-                              example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
-                           
+{
+  "title": "NEXTJS lvl 1 ",
+  "description": "updated",
+  "price": 100,
+  "image": "https://google.com",
+  "requirements": [
+        "React Dasar",
+        "Express"
+      ],
+  "author": "coursehubh",
+  "level": "intermediate",
+  "chapters": [
+    {
+      "name": "Chapter 1",
+      "modules": [
+        {
+          "title": "Module 1",
+          "duration": 10,
+          "url": "https://google.com"
+        },
+        {
+          "title": "Module 2",
+          "duration": 15,
+          "url": "https://google.com"
+        }
+      ]
+    },
+    {
+      "name": "Chapter 2",
+      "modules": [
+        {
+          "title": "Module 3",
+          "duration": 20,
+          "url": "https://google.com"
+        }
+      ]
+    }
+  ]
+}
