@@ -1,5 +1,5 @@
 const prisma = require('../libs/prisma');
-const { createCourseSchema, getCourseSchema } = require('../validations/course.validation');
+const { createCourseSchema, getCourseSchema, joinCourseSchema } = require('../validations/course.validation');
 const { getPagination } = require('../libs/getPaggination');
 
 const createCourse = async (req, res, next) => {
@@ -99,10 +99,8 @@ const getCourses = async (req, res, next) => {
           category: {
             name_categories: typeof category === 'string' ? { in: [category] } : { in: [...category] },
           },
-          ...(level && { level })
+          ...(level && { level }),
         },
-
-        
       });
 
       return res.status(200).json({
@@ -147,7 +145,110 @@ const getCourses = async (req, res, next) => {
   }
 };
 
+const joinCourse = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.body;
+
+    await joinCourseSchema.validateAsync({ ...req.params, ...req.body });
+
+    const course = await prisma.courses.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    if (!course) {
+      return res.status(404).json({
+        status: false,
+        message: 'Course not found',
+        data: null,
+      });
+    }
+
+    const user = await prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: 'User not found',
+        data: null,
+      });
+    }
+
+    // check if user already join course
+    const checkJoin = await prisma.users.findFirst({
+      where: {
+        email,
+        courses: {
+          some: {
+            id: Number(id),
+          },
+        },
+      },
+    });
+
+    if (checkJoin) {
+      return res.status(409).json({
+        status: false,
+        message: 'User already join this course',
+        data: null,
+      });
+    }
+
+    const join = await prisma.users.update({
+      where: {
+        email,
+      },
+      data: {
+        courses: {
+          connect: {
+            id: Number(id),
+          },
+        },
+      },
+    });
+
+    res.status(201).json({
+      status: true,
+      message: 'Join course successfully',
+      data: join,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const myCourse = async (req, res, next) => {
+  try {
+    const { email } = req.user;
+
+    const {courses} = await prisma.users.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        courses: true,
+      },
+    });
+
+    res.status(200).json({
+      status: true,
+      message: 'Courses retrieved successfully',
+      data: [...courses]
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   createCourse,
   getCourses,
+  joinCourse,
+  myCourse,
 };
