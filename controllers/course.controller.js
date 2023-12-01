@@ -1,5 +1,5 @@
 const prisma = require('../libs/prisma');
-const { createCourseSchema, getCourseSchema } = require('../validations/course.validation');
+const { createCourseSchema, getCourseSchema, updateCourseSchema } = require('../validations/course.validation');
 const { getPagination } = require('../libs/getPaggination');
 
 const createCourse = async (req, res, next) => {
@@ -146,7 +146,32 @@ const getCourses = async (req, res, next) => {
     next(error);
   }
 };
+const updateCourse = async (req, res, next) => {
+  try {
+    const course_id = parseInt(req.params.id);
 
+    const { error } = updateCourseSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation Error',
+        error: error.details[0].message,
+        data: null,
+      });
+    }
+
+    const existingCourse = await prisma.courses.findUnique({
+      where: {
+        id: course_id,
+      },
+    });
+
+    if (!existingCourse) {
+      return res.status(404).json({
+        success: false,
+        message: 'Course not found',
+        error: 'Course with the provided ID does not exist',
+        
 const deleteCourse = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -165,6 +190,58 @@ const deleteCourse = async (req, res, next) => {
       });
     }
 
+    const { title, description, price, image, chapters, requirements, author, level } = req.body;
+
+    const existingChapters = await prisma.chapters.findMany({
+      where: {
+        course_id: course_id,
+      },
+    });
+
+    for (const chapter of existingChapters) {
+      await prisma.modules.deleteMany({
+        where: {
+          chapter_id: chapter.id,
+        },
+      });
+    }
+
+    const updatedCourse = await prisma.courses.update({
+      where: {
+        id: course_id,
+      },
+      data: {
+        title,
+        description,
+        image,
+        price,
+        author,
+        level,
+        requirements: { set: requirements },
+        chapters: {
+          deleteMany: { course_id: course_id },
+          create: chapters.map((chapter) => {
+            return {
+              name: chapter.name,
+              modules: {
+                create: chapter.modules.map((module) => {
+                  return {
+                    title: module.title,
+                    duration: module.duration,
+                    url: module.url,
+                  };
+                }),
+              },
+            };
+          }),
+        },
+      },
+      include: {
+        chapters: {
+          include: {
+            modules: true,
+          },
+        },
     await prisma.courses.delete({
       where: {
         id: Number(id),
@@ -172,6 +249,9 @@ const deleteCourse = async (req, res, next) => {
     });
 
     res.status(200).json({
+      success: true,
+      message: 'Course updated successfully',
+      data: updatedCourse,
       status: true,
       message: 'Course deleted successfully',
       data: null,
@@ -179,10 +259,12 @@ const deleteCourse = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
 }
 
 module.exports = {
   createCourse,
   getCourses,
+  updateCourse,
   deleteCourse,
 };
