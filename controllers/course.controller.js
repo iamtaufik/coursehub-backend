@@ -77,6 +77,9 @@ const getCourses = async (req, res, next) => {
           },
           AND: { isDeleted: false },
         },
+        include: {
+          category: true,
+        },
       });
 
       return res.status(200).json({
@@ -95,6 +98,9 @@ const getCourses = async (req, res, next) => {
           },
           AND: { isDeleted: false },
         },
+        include: {
+          category: true,
+        },
       });
 
       return res.status(200).json({
@@ -112,6 +118,9 @@ const getCourses = async (req, res, next) => {
             in: [level],
           },
           AND: { isDeleted: false },
+        },
+        include: {
+          category: true,
         },
       });
 
@@ -133,6 +142,9 @@ const getCourses = async (req, res, next) => {
         ...filterOptions[filter],
         where: {
           isDeleted: false,
+        },
+        include: {
+          category: true,
         },
       });
       return res.json({
@@ -158,6 +170,9 @@ const getCourses = async (req, res, next) => {
           },
           ...(level && { level }),
         },
+        include: {
+          category: true,
+        },
       });
 
       return res.status(200).json({
@@ -173,6 +188,9 @@ const getCourses = async (req, res, next) => {
         where: { isDeleted: false },
         skip: (Number(page) - 1) * Number(limit),
         take: Number(limit),
+        include: {
+          category: true,
+        },
       });
 
       const { _count } = await prisma.courses.aggregate({
@@ -381,6 +399,14 @@ const joinCourse = async (req, res, next) => {
         AND: { isDeleted: false },
       },
     });
+
+    if (course.price > 0) {
+      return res.status(400).json({
+        status: false,
+        message: 'Bad Request',
+        data: 'Courses not free',
+      });
+    }
 
     if (!course) {
       return res.status(404).json({
