@@ -28,6 +28,15 @@ Content-Type: application/json
   "password":"user12345"
 }
 
+### Login
+POST http://localhost:3000/api/v1/auth/admin/login
+Content-Type: application/json
+
+{
+  "idAdmin":"admin-course-hub",
+  "password":"admin123"
+}
+
 ### forgot password
 POST http://localhost:3000/api/v1/auth/forgotPassword
 Content-Type: application/json
@@ -54,7 +63,7 @@ POST http://localhost:3000/api/v1/auth/admin/login
 Content-Type: application/json
 
 {
-  "idAdmin":"admin-course-hubb@gmail.com",
+  "idAdmin":"admin-course-hub",
   "password":"admin123"
 }
 
@@ -117,7 +126,7 @@ Content-Type: application/json
 
 ### get detail courses
 GET http://localhost:3000/api/v1/courses/1
-=======
+Content-Type: application/json
 
 ###
 GET http://localhost:3000/api/v1/courses
@@ -127,7 +136,7 @@ Content-Type: application/json
 ###
 PUT http://localhost:3000/api/v1/courses/1
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0MzAyNzUsImV4cCI6MTcwMTUxNjY3NX0.1MT9lM1xupj_H8ZL5JIAq-JLjJwuF9w4GIfamNPXag0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0Mzc1NzksImV4cCI6MTcwMTUyMzk3OX0.Ldai3wCTko_E80jUK5InUYbWQq5vdcc-nadUbGv4w1Y
 
 {
   "title": "NEXTJS lvl 1 ",

@@ -1,14 +1,18 @@
 openapi: 3.0.0
 info:
   title: Docs API Backend Coursehub
-  description: Documentasi API untuk autentikasi pengguna (berbasis Token)
+  description: |-
+    Backend sistem API CourseHub untuk website MOOC adalah bagian integral dari struktur teknologi yang mendukung fungsi aplikasi atau situs web MOOC. Fungsinya adalah mengelola dan menyediakan data terkait kursus, pengguna, materi pelajaran, dan informasi relevan lainnya kepada pengguna. API backend CourseHub memberikan akses kepada pengembang untuk mengambil dan menyinkronkan informasi terkini secara otomatis.
+
+    API backend ini mencakup berbagai endpoint atau titik akses yang memfasilitasi penggunaan data seperti detail kursus, informasi pengguna, materi pelajaran, kemajuan pengguna, dan fitur terkait lainnya. Penggunaan API melibatkan operasi seperti pencarian kursus, pemfilteran data, dan pengambilan informasi untuk integrasi dengan antarmuka pengguna pada aplikasi MOOC.
+
+    Dengan memanfaatkan API backend CourseHub, pengembang dapat mengintegrasikan fungsionalitas sistem dengan aplikasi eksternal atau mengembangkan aplikasi khusus yang menampilkan dan memanfaatkan data kursus secara efisien. Ini membantu dalam menyebarkan informasi tentang kursus secara luas dan meningkatkan pengalaman pengguna pada platform MOOC.
   version: 1.0.0
   contact:
     name: CourseHub
     email: CourseHubreal@gmail.com
 servers:
   - url: http://localhost:3000/api/v1
-  - url: https://backend_coursehub.test/api/v1
   - url: https://coursehub-development.vercel.app/api/v1
   - url: https://coursehub-production.vercel.app/api/v1
 tags:
@@ -294,6 +298,30 @@ paths:
               type: integer
             required: false
             description: Number of items per page.
+          - in: query
+            name: search
+            schema:
+              type: string
+            required: false
+            description: Search by course title.
+          - in: query
+            name: sort
+            schema:
+              type: string
+            required: false
+            description: Sort course.
+          - in: query
+            name: level
+            schema:
+              type: string
+            required: false
+            description: Filter by level.
+          - in: query
+            name: category
+            schema:
+              type: string
+            required: false
+            description: Filter by category.
         responses:
           "200":
             description: Courses retrieved successfully!
@@ -348,7 +376,7 @@ paths:
       tags:
         - Course
       operationId: put-update-course
-      summary: Update course details
+      summary: Update Course Details
       description: Updates details of a specific course.
       parameters:
         - in: path
@@ -379,19 +407,19 @@ paths:
     delete:
       tags:
         - Course
-      operationId: delete-remove-users
-      summary: Delete users
-      description: Deletes a specific users.
+      operationId: delete-remove-course
+      summary: Delete Course
+      description: Deletes a specific course.
       parameters:
         - in: path
           name: id
           schema:
             type: integer
           required: true
-          description: The ID of the user to delete.
+          description: The ID of the course to delete.
       responses:
         "200":
-          description: Successful users deletion
+          description: Successful course deletion
           content:
             application/json:
               schema:
@@ -402,6 +430,61 @@ paths:
                       data:
                         type: object
                         example: null
+                        
+      security:
+      - bearerAuth: [] 
+                        
+                        
+  "/courses/{id}/join":
+    put:
+      tags:
+        - Course
+      operationId: post-users-join-course
+      summary: Create Users join course
+      description: Create Data Users Join Course
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      requestBody:
+            $ref: '#/components/requestBodies/createForgotPassword'
+      responses: 
+        "201":
+            description: Join course successfully!
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - $ref: "#/components/schemas/BasicResponse"
+                    - type: object
+
+      security:
+      - bearerAuth: [] 
+      
+      
+  "/courses/me":
+    get:
+      tags:
+        - Course
+      operationId: get-users-join-course
+      summary: Get Detail Users join course
+      description: Get Detail Users Join Course
+      responses: 
+        "200":
+            description: Courses retrieved successfully!
+            content:
+              application/json:
+                schema:
+                  allOf:
+                    - $ref: "#/components/schemas/BasicResponse"
+                    - type: object
+
+                        
+      security:
+      - bearerAuth: []  
                               
                               
   /categories:
@@ -451,6 +534,9 @@ paths:
                       properties:
                         data:
                           $ref: "#/components/schemas/CourseModel"
+                          
+                          
+  
 
 
 
@@ -565,7 +651,7 @@ components:
           example: "test_dev@gmail.com"
         password:
           type: string
-          example: "test_dev020102"
+          example: "*********"
           
     AdminModel:
       title: Admin
@@ -579,7 +665,7 @@ components:
           example: "admin-course-hub"
         password:
           type: string
-          example: "admin123"
+          example: "*********"
           
     ForgotPasswordModel:
       title: Forgot Password
@@ -595,10 +681,10 @@ components:
       properties:
         password:
           type: string
-          example: "user123"
+          example: "*********"
         confirm_password:
           type: string
-          example: "user123"
+          example: "*********"
           
           
     CourseModel:
@@ -794,9 +880,9 @@ components:
                   items:
                     type: string
                   example:
-                    - "Persyaratan 1"
-                    - "Persyaratan 2"
-                    - "Persyaratan 3"
+                    - "React JS"
+                    - "Tailwind css"
+                    - "Node JS"
                 chapters:
                   type: array
                   items:
@@ -834,29 +920,25 @@ components:
                 description:
                   type: string
                   example: "Description beginner 1"
-                image:
-                  type: string
-                  example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
                 price:
                   type: integer
                   example: 150000
+                image:
+                  type: string
+                  example: "https://youtu.be/kWT1uGvhWp8?feature=shared"
+                requirements:
+                  type: array
+                  items:
+                    type: string
+                  example:
+                    - "React Dasar"
+                    - "Express"
                 author:
                   type: string
                   example: "CourseHub"
                 level:
                   type: string
                   example: "beginner"
-                category_id:
-                  type: integer
-                  example: "1"
-                requirements:
-                  type: array
-                  items:
-                    type: string
-                  example:
-                    - "Persyaratan 1"
-                    - "Persyaratan 2"
-                    - "Persyaratan 3"
                 chapters:
                   type: array
                   items:
