@@ -1,16 +1,10 @@
 require('dotenv').config();
-const prisma = require("../libs/prisma");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const otpHandler = require("../libs/otpHandler");
-const nodemailer = require("../libs/nodemailer");
-const {
-  registerUserSchema,
-  createAdminSchema,
-  loginAdminSchema,
-  loginUserSchema,
-  verifyOTPSchema,
-} = require("../validations/auth.validation");
+const prisma = require('../libs/prisma');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const otpHandler = require('../libs/otpHandler');
+const nodemailer = require('../libs/nodemailer');
+const { registerUserSchema, createAdminSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema } = require('../validations/auth.validation');
 const { use } = require('../routes/auth.route');
 
 // login user
@@ -26,7 +20,7 @@ const loginUser = async (req, res, next) => {
     if (error) {
       return res.status(400).json({
         success: false,
-        message: "Bad Request",
+        message: 'Bad Request',
         err: error.message,
         data: null,
       });
@@ -36,13 +30,16 @@ const loginUser = async (req, res, next) => {
       where: {
         email: email,
       },
+      include: {
+        profile: true,
+      },
     });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "Bad Request",
-        err: "User not found",
+        message: 'Bad Request',
+        err: 'User not found',
         data: null,
       });
     }
@@ -52,8 +49,8 @@ const loginUser = async (req, res, next) => {
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: "Bad Request",
-        err: "Wrong Email or Password",
+        message: 'Bad Request',
+        err: 'Wrong Email or Password',
         data: null,
       });
     }
@@ -61,8 +58,8 @@ const loginUser = async (req, res, next) => {
     if (!user.isVerified) {
       return res.status(400).json({
         success: false,
-        message: "Bad Request",
-        err: "User not verified",
+        message: 'Bad Request',
+        err: 'User not verified',
         data: null,
       });
     }
@@ -71,17 +68,18 @@ const loginUser = async (req, res, next) => {
       id: user.id,
       nickname: user.nickname,
       email: user.email,
+      phone_number: user.phone_number,
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: '1d',
     });
 
     delete user.password;
 
     return res.status(200).json({
       success: true,
-      message: "Login success",
+      message: 'Login success',
       err: null,
       data: {
         user: user,
@@ -108,7 +106,7 @@ const register = async (req, res, next) => {
     if (error) {
       return res.status(400).json({
         status: false,
-        message: "Bad Request",
+        message: 'Bad Request',
         err: error.message,
         data: null,
       });
@@ -120,8 +118,8 @@ const register = async (req, res, next) => {
     if (userExist) {
       return res.status(400).json({
         status: false,
-        message: "Bad Request",
-        err: "Email already exists!",
+        message: 'Bad Request',
+        err: 'Email already exists!',
         data: null,
       });
     }
@@ -152,11 +150,11 @@ const register = async (req, res, next) => {
 
     const otp = await otpHandler.generateOTP(email);
     const html = `Your OTP for account activation is: <strong>${otp}</strong>`;
-    await nodemailer.sendEmail(email, "Account Activation OTP", html);
+    await nodemailer.sendEmail(email, 'Account Activation OTP', html);
 
     return res.status(201).json({
       status: true,
-      message: "Created Successfully!",
+      message: 'Created Successfully!',
       err: null,
       data: {
         users,
@@ -179,7 +177,7 @@ const loginAdmin = async (req, res, next) => {
     if (error) {
       return res.status(400).json({
         success: false,
-        message: "Bad Request",
+        message: 'Bad Request',
         err: error.message,
         data: null,
       });
@@ -194,7 +192,7 @@ const loginAdmin = async (req, res, next) => {
     if (!admin) {
       return res.status(404).json({
         success: false,
-        message: "Admin not found",
+        message: 'Admin not found',
         data: null,
       });
     }
@@ -204,7 +202,7 @@ const loginAdmin = async (req, res, next) => {
     if (!isMatch) {
       return res.status(400).json({
         success: false,
-        message: "Wrong id or Password",
+        message: 'Wrong id or Password',
         data: null,
       });
     }
@@ -215,12 +213,12 @@ const loginAdmin = async (req, res, next) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: '1d',
     });
 
     return res.status(200).json({
       success: true,
-      message: "Login success",
+      message: 'Login success',
       data: token,
     });
   } catch (error) {
@@ -231,7 +229,7 @@ const loginAdmin = async (req, res, next) => {
 const authenticate = (req, res, next) => {
   return res.status(200).json({
     status: true,
-    message: "OK",
+    message: 'OK',
     err: null,
     data: { user: req.user },
   });
@@ -255,7 +253,7 @@ const createAdmin = async (req, res, next) => {
     if (admin) {
       return res.status(404).json({
         success: false,
-        message: "Admin already exists",
+        message: 'Admin already exists',
         data: null,
       });
     }
@@ -271,7 +269,7 @@ const createAdmin = async (req, res, next) => {
 
     return res.status(201).json({
       success: true,
-      message: "Created Successfully!",
+      message: 'Created Successfully!',
       data: newAdmin,
     });
   } catch (error) {
@@ -291,7 +289,7 @@ const verifyOTP = async (req, res) => {
     if (error) {
       return res.status(400).json({
         status: false,
-        message: "Bad Request",
+        message: 'Bad Request',
         err: error.message,
         data: null,
       });
@@ -302,7 +300,7 @@ const verifyOTP = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         status: false,
-        message: "User not found",
+        message: 'User not found',
         err: null,
         data: null,
       });
@@ -313,8 +311,8 @@ const verifyOTP = async (req, res) => {
     if (otp !== storedOTP) {
       return res.status(400).json({
         status: false,
-        message: "Bad request",
-        err: "Invalid OTP",
+        message: 'Bad request',
+        err: 'Invalid OTP',
         data: null,
       });
     }
@@ -327,7 +325,7 @@ const verifyOTP = async (req, res) => {
 
     return res.json({
       status: true,
-      message: "Account activated successfully",
+      message: 'Account activated successfully',
       err: null,
       data: null,
     });
@@ -345,7 +343,7 @@ const forgotPassword = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         status: false,
-        message: "User not found",
+        message: 'User not found',
         err: null,
         data: null,
       });
@@ -365,11 +363,11 @@ const forgotPassword = async (req, res, next) => {
       <p>You have requested to reset your password.</p>
       <p>Please click on the link below to reset your password:</p>
       <a href="${url}">${url}</a>`;
-      await nodemailer.sendEmail(email, "Reset Password Request", html);
+      await nodemailer.sendEmail(email, 'Reset Password Request', html);
 
       return res.json({
         status: true,
-        message: "Password reset link sent to email successfully",
+        message: 'Password reset link sent to email successfully',
         err: null,
         data: null,
       });
@@ -388,7 +386,7 @@ const resetPassword = async (req, res, next) => {
     if (!decode) {
       return res.status(400).json({
         status: false,
-        message: "Token Invalid!",
+        message: 'Token Invalid!',
         err: null,
         data: null,
       });
@@ -399,7 +397,7 @@ const resetPassword = async (req, res, next) => {
     if (password !== confirm_password) {
       return res.status(400).json({
         status: false,
-        message: "Password & Confirm_Password do not match!",
+        message: 'Password & Confirm_Password do not match!',
         err: null,
         data: null,
       });
@@ -416,11 +414,10 @@ const resetPassword = async (req, res, next) => {
 
     return res.status(200).json({
       status: true,
-      message: "Password updated successfully!",
+      message: 'Password updated successfully!',
       err: null,
       data: null,
     });
-
   } catch (error) {
     next(error);
   }
