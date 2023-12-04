@@ -77,7 +77,7 @@ const notification = async (req, res, next) => {
 
     if (transaction) {
       if (transaction_status === 'settlement') {
-        await prisma.transactions.update({
+        const transaction = await prisma.transactions.update({
           where: {
             orderId: Number(order_id),
           },
@@ -85,6 +85,21 @@ const notification = async (req, res, next) => {
             status: 'paid',
           },
         });
+
+        // set course to user
+        await prisma.users.update({
+          where: {
+            id: transaction.userId,
+          },
+          data: {
+            courses: {
+              connect: {
+                id: transaction.courseId,
+              },
+            },
+          },
+        });
+
       } else if (transaction_status === 'cancel') {
         await prisma.transactions.update({
           where: {
