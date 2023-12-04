@@ -5,5 +5,6 @@ router.use('/courses', require('./course.route'));
 router.use('/categories', require('./category.route'));
 router.use('/payment', require('./payment.route'));
 router.use('/transactions', require('./transaction.route'));
+router.use('/', require('./dashboard.route'));
 
 module.exports = router;
