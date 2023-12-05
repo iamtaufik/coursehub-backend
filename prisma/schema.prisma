@@ -8,7 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 
@@ -125,27 +125,11 @@ model Transactions {
   courseId     Int
   total_price  Int
   status       String
+  payment_type String?  
+  transaction_time DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   user         Users    @relation(fields: [userId], references: [id])
   course       Courses  @relation(fields: [courseId], references: [id])
-}
-
-model Notifications {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  title        String
-  description  String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  user         Users    @relation(fields: [userId], references: [id])
-}
-
-model PromoCodes {
-  id           Int      @id @default(autoincrement())
-  code         String   @unique
-  discount     Int
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
 }

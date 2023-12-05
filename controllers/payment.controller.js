@@ -16,7 +16,6 @@ const checkout = async (req, res, next) => {
         message: 'Please provide courseId, courseName, and price',
       });
     }
-    console.log({ ...req.body });
     const parameter = {
       item_details: [
         {
@@ -37,7 +36,6 @@ const checkout = async (req, res, next) => {
       },
     };
 
-    console.log('paramater', parameter);
 
     const token = await snap.createTransactionToken(parameter);
 
@@ -64,11 +62,8 @@ const checkout = async (req, res, next) => {
 
 const notification = async (req, res, next) => {
   try {
-    const { order_id, transaction_status } = req.body;
-    console.log({
-      order_id,
-      transaction_status,
-    });
+    const { order_id, transaction_status, payment_type, transaction_time } = req.body;
+
     const transaction = await prisma.transactions.findUnique({
       where: {
         orderId: Number(order_id),
@@ -83,6 +78,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'paid',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
 
@@ -99,7 +96,6 @@ const notification = async (req, res, next) => {
             },
           },
         });
-
       } else if (transaction_status === 'cancel') {
         await prisma.transactions.update({
           where: {
@@ -107,6 +103,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'cancelled',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       } else if (transaction_status === 'expire') {
@@ -116,6 +114,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'expired',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       } else if (transaction_status === 'deny') {
@@ -125,6 +125,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'failed',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       }
