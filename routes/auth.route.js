@@ -16,5 +16,5 @@ router.get('/whoami', verifyToken, authenticate);
 router.post('/forgotPassword', forgotPassword);
 router.post('/reset-password', resetPassword)
 router.get('/admin/whoami', verifyToken, verifyAdmin, authenticate);
-router.put('/change-password', changePassword);
+router.put('/change-password',verifyToken, changePassword);
 module.exports = router;

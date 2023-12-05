@@ -425,8 +425,8 @@ const resetPassword = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   try {
-    const { password, new_password, confirm_password } = req.body;
-    const token = req.query.token;
+    const { new_password, confirm_password } = req.body;
+    const { email } = req.user; 
 
     if (new_password !== confirm_password) {
       return res.status(400).json({
@@ -437,25 +437,13 @@ const changePassword = async (req, res, next) => {
       });
     }
 
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (err) {
-      return res.status(401).json({
-        status: false,
-        message: 'Invalid or expired token',
-        err: err.message,
-        data: null,
-      });
-    }
-
-    const currentUser = await prisma.users.findUnique({
+    const user = await prisma.users.findUnique({
       where: {
-        id: decoded.id, 
+        email,
       },
     });
 
-    if (!currentUser) {
+    if (!user) {
       return res.status(404).json({
         status: false,
         message: 'User not found',
@@ -464,7 +452,8 @@ const changePassword = async (req, res, next) => {
       });
     }
 
-    const isMatch = await bcrypt.compare(password, currentUser.password);
+    
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({
@@ -479,7 +468,7 @@ const changePassword = async (req, res, next) => {
 
     await prisma.users.update({
       where: {
-        id: decoded.id,
+        email,
       },
       data: {
         password: encryptedNewPassword,
