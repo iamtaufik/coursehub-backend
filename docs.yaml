@@ -246,6 +246,34 @@ paths:
                         example: Unauthorized
       security:
         - bearerAuth: []
+  /auth/change-password:
+    put:
+      tags:
+        - Users
+      operationId: put-change-password
+      summary: Change Password
+      description: Update user password, input old password, new password, confirm new password.
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: Token received after successful login.
+      requestBody:
+        $ref: '#/components/requestBodies/createChangePassword'
+      responses:
+        '200':
+          description: Password updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChangePasswordModel'
 
   /courses:
     post:
@@ -796,6 +824,20 @@ components:
           type: string
           example: '*********'
 
+    ChangePasswordModel:
+      title: Change Password
+      type: object
+      properties:
+        password:
+          type: string
+          example: '*********'
+        new_password:
+          type: string
+          example: '*********'
+        confirm_password:
+          type: string
+          example: '*********'
+
     CourseModel:
       title: Course
       type: object
@@ -966,6 +1008,22 @@ components:
               confirm_password:
                 type: string
                 example: '***********'
+
+    createChangePassword:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                example: '*********'
+              new_password:
+                type: string
+                example: '*********'
+              confirm_password:
+                type: string
+                example: '*********'
 
     createToken:
       content:
