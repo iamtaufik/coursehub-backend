@@ -7,60 +7,123 @@ const snap = new Midtrans.Snap({
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 
+// const checkout = async (req, res, next) => {
+//   try {
+//     const { email, phone_number } = req.user;
+//     const { courseId, courseName, price } = req.body;
+//     if (!courseId || !courseName || !price) {
+//       return res.status(400).json({
+//         message: 'Please provide courseId, courseName, and price',
+//       });
+//     }
+//     console.log({ ...req.body });
+//     const parameter = {
+//       item_details: [
+//         {
+//           id: courseId,
+//           name: courseName,
+//           price: Number(price),
+//           quantity: 1,
+//         },
+//       ],
+//       transaction_details: {
+//         order_id: Math.round(Math.random() * 1000000000),
+//         gross_amount: Number(price),
+//       },
+//       customer_details: {
+//         first_name: email,
+//         email: email,
+//         phone: phone_number,
+//       },
+//     };
+
+//     console.log('paramater', parameter);
+
+//     const token = await snap.createTransactionToken(parameter);
+
+//     const transaction = await prisma.transactions.create({
+//       data: {
+//         orderId: parameter.transaction_details.order_id,
+//         total_price: price,
+//         courseId: courseId,
+//         status: 'pending',
+//         userId: req.user.id,
+//       },
+//     });
+
+//     return res.status(200).json({
+//       status: true,
+//       message: 'Checkout success',
+//       orderId: transaction.orderId,
+//       token: token,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+function generateUniqueOrderId() {
+  const timestamp = new Date().getTime();
+  const randomPart = Math.floor(Math.random() * 10000);
+
+  const orderId = (timestamp * 10000 + randomPart) % 2147483647;
+
+  return orderId;
+}
+
 const checkout = async (req, res, next) => {
   try {
-    const { email, phone_number } = req.user;
-    const { courseId, courseName, price } = req.body;
-    if (!courseId || !courseName || !price) {
-      return res.status(400).json({
-        message: 'Please provide courseId, courseName, and price',
+    const { userId, courseId, promoId } = req.body;
+
+    const course = await prisma.courses.findUnique({
+      where: { id: courseId },
+    });
+
+    let total_price = course.price;
+    let discount = 0;
+
+    if (promoId) {
+      const promo = await prisma.promo.findUnique({
+        where: { id: promoId },
       });
+
+      if (promo && promo.expiresAt > new Date()) {
+
+        // Menghitung diskon berdasarkan persentase
+        discount = (promo.discount / 100) * course.price;
+
+        // Mengurangkan diskon dari total_price
+        total_price -= discount;
+      }
     }
-    console.log({ ...req.body });
-    const parameter = {
-      item_details: [
-        {
-          id: courseId,
-          name: courseName,
-          price: Number(price),
-          quantity: 1,
-        },
-      ],
-      transaction_details: {
-        order_id: Math.round(Math.random() * 1000000000),
-        gross_amount: Number(price),
-      },
-      customer_details: {
-        first_name: email,
-        email: email,
-        phone: phone_number,
-      },
-    };
 
-    console.log('paramater', parameter);
-
-    const token = await snap.createTransactionToken(parameter);
+    const orderId = generateUniqueOrderId();
 
     const transaction = await prisma.transactions.create({
       data: {
-        orderId: parameter.transaction_details.order_id,
-        total_price: price,
-        courseId: courseId,
-        status: 'pending',
-        userId: req.user.id,
+        userId,
+        courseId,
+        total_price,
+        discount,
+        status: 'Pending',
+        promoId: promoId ? promoId : null,
+        orderId,
       },
     });
 
-    return res.status(200).json({
-      status: true,
-      message: 'Checkout success',
-      orderId: transaction.orderId,
-      token: token,
+    res.status(200).json({
+      success: true,
+      message: 'Checkout Successfully!',
+      data: transaction,
     });
+
   } catch (error) {
     next(error);
   }
 };
+
+
+
 
 const notification = async (req, res, next) => {
   try {
