@@ -189,3 +189,16 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pb
     }
   ]
 }
+
+
+#### countActiveUsers
+GET http://localhost:3000/api/v1/activeUsers/
+Content-Type: application/json
+
+#### countActiveClass
+GET http://localhost:3000/api/v1/activeClass/
+Content-Type: application/json
+
+#### countPremiumClass
+GET http://localhost:3000/api/v1/premiumClass/
+Content-Type: application/json

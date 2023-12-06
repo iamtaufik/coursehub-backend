@@ -20,6 +20,8 @@ tags:
     description: Operations related to auth Users
   - name: Admin
     description: Operations related to auth Admin
+  - name: Count Dashboard Admin
+    description: Operations related to auth Count Dashboard Admin
   - name: Course
     description: Operations related to Course
   - name: Category
@@ -246,6 +248,7 @@ paths:
                         example: Unauthorized
       security:
         - bearerAuth: []
+  
   /auth/change-password:
     put:
       tags:
@@ -274,6 +277,67 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/ChangePasswordModel'
+        
+  /activeUsers:
+    get:
+      tags:
+        - Count Dashboard Admin
+      operationId: get-fetch-all-active-users
+      summary: Get All Active Users
+      description: Retrieves details of a specific Active Users.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+      security:
+        - bearerAuth: []
+        
+        
+  /activeClass:
+    get:
+      tags:
+        - Count Dashboard Admin
+      operationId: get-fetch-all-active-class
+      summary: Get All Active Class
+      description: Retrieves details of a specific Active Class.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+      security:
+        - bearerAuth: []
+        
+        
+  /premiumClass:
+    get:
+      tags:
+        - Count Dashboard Admin
+      operationId: get-fetch-all-premium-class
+      summary: Get All Premium Class
+      description: Retrieves details of a specific Premium Class.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+      security:
+        - bearerAuth: []
 
   /courses:
     post:
@@ -640,7 +704,7 @@ paths:
     get:
       tags:
         - Transaction
-      operationId: get-fetch-all-transaction
+      operationId: get-fetch-all-transaction-me
       summary: Get all Transaction
       description: Retrieves a list of all registered transaction.
 
