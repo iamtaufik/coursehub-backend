@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const otpHandler = require('../libs/otpHandler');
 const nodemailer = require('../libs/nodemailer');
 const { registerUserSchema, createAdminSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema } = require('../validations/auth.validation');
-const { use } = require('../routes/auth.route');
 
 // login user
 const loginUser = async (req, res, next) => {
@@ -425,7 +424,7 @@ const resetPassword = async (req, res, next) => {
 
 const changePassword = async (req, res, next) => {
   try {
-    const { new_password, confirm_password } = req.body;
+    const { old_password, new_password, confirm_password } = req.body;
     const { email } = req.user; 
 
     if (new_password !== confirm_password) {
@@ -453,7 +452,7 @@ const changePassword = async (req, res, next) => {
     }
 
     
-    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    const isMatch = await bcrypt.compare(old_password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({
