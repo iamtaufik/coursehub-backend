@@ -3,9 +3,9 @@ POST http://localhost:3000/api/v1/auth/register
 Content-Type: application/json
 
 {
-  "nickname":"usertest04",
-  "email":"usertest04@gmail.com",
-  "phone_number":"0829932992",
+  "nickname":"chptw",
+  "email":"capex80153@getmola.com",
+  "phone_number":"08131212322",
   "password":"user123"
 }
 
@@ -14,8 +14,8 @@ POST http://localhost:3000/api/v1/auth/verifyOTP
 Content-Type: application/json
 
 {
-  "email":"usertest04@gmail.com",
-  "otp": "PKMDWH"
+  "email":"capex80153@getmola.com",
+  "otp": "ksIY46"
 }
 
 
@@ -24,8 +24,8 @@ POST http://localhost:3000/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email":"dtekchannel02@gmail.com",
-  "password":"user123"
+  "email":"capex80153@getmola.com",
+  "password":"user123456"
 }
 
 ### Login
@@ -65,6 +65,18 @@ Content-Type: application/json
 {
   "idAdmin":"admin-course-hub",
   "password":"admin123"
+}
+
+
+### change password
+PUT http://localhost:3000/api/v1/auth/change-password
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjMsIm5pY2tuYW1lIjoiY2hwdHciLCJlbWFpbCI6ImNhcGV4ODAxNTNAZ2V0bW9sYS5jb20iLCJpYXQiOjE3MDE3OTIwODAsImV4cCI6MTcwMTg3ODQ4MH0.ir8vahG_IL1s1v1CG7g5fnRFANKcId11WmopI3yHQrA
+Content-Type: application/json
+
+{
+  "password":"user123456",
+  "new_password":"user1234",
+  "confirm_password":"user1234"
 }
 
 ###
