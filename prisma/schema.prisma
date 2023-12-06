@@ -127,6 +127,8 @@ model Transactions {
   status      String
   promo       Promo?   @relation(fields: [promoId], references: [id])
   promoId     Int?
+  payment_type String?  
+  transaction_time DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

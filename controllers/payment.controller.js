@@ -96,6 +96,26 @@ const checkout = async (req, res, next) => {
         total_price -= discount;
       }
     }
+    const parameter = {
+      item_details: [
+        {
+          id: courseId,
+          name: courseName,
+          price: Number(price),
+          quantity: 1,
+        },
+      ],
+      transaction_details: {
+        order_id: Math.round(Math.random() * 1000000000),
+        gross_amount: Number(price),
+      },
+      customer_details: {
+        first_name: email,
+        email: email,
+        phone: phone_number,
+      },
+    };
+
 
     const orderId = generateUniqueOrderId();
 
@@ -127,11 +147,8 @@ const checkout = async (req, res, next) => {
 
 const notification = async (req, res, next) => {
   try {
-    const { order_id, transaction_status } = req.body;
-    console.log({
-      order_id,
-      transaction_status,
-    });
+    const { order_id, transaction_status, payment_type, transaction_time } = req.body;
+
     const transaction = await prisma.transactions.findUnique({
       where: {
         orderId: Number(order_id),
@@ -140,12 +157,28 @@ const notification = async (req, res, next) => {
 
     if (transaction) {
       if (transaction_status === 'settlement') {
-        await prisma.transactions.update({
+        const transaction = await prisma.transactions.update({
           where: {
             orderId: Number(order_id),
           },
           data: {
             status: 'paid',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
+          },
+        });
+
+        // set course to user
+        await prisma.users.update({
+          where: {
+            id: transaction.userId,
+          },
+          data: {
+            courses: {
+              connect: {
+                id: transaction.courseId,
+              },
+            },
           },
         });
       } else if (transaction_status === 'cancel') {
@@ -155,6 +188,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'cancelled',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       } else if (transaction_status === 'expire') {
@@ -164,6 +199,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'expired',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       } else if (transaction_status === 'deny') {
@@ -173,6 +210,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'failed',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       }
