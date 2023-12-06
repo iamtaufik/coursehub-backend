@@ -138,7 +138,7 @@ model Transactions {
 
 model Promo {
   id           Int            @id @default(autoincrement())
-  code_promo   String
+  code_promo   String         @unique
   discount     Int
   expiresAt    DateTime
   transactions Transactions[]
