@@ -6,11 +6,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
-
 
 enum Levels {
   beginner
@@ -28,18 +27,18 @@ model Admin {
 
 // model users
 model Users {
-  id        Int       @id @default(autoincrement())
-  nickname  String
-  email     String    @unique
-  password  String
-  otp       String?
-  courses   Courses[] @relation("UserToCourse")
-  transactions Transactions[]
-  profile   Profiles?
+  id                 Int                  @id @default(autoincrement())
+  nickname           String
+  email              String               @unique
+  password           String
+  otp                String?
+  courses            Courses[]            @relation("UserToCourse")
+  transactions       Transactions[]
+  profile            Profiles?
   userCourseProgress UserCourseProgress[]
-  isVerified Boolean   @default(false)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  isVerified         Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 }
 
 // model profiles
@@ -64,30 +63,30 @@ model Categories {
 
 // model Courses
 model Courses {
-  id           Int        @id @default(autoincrement())
-  title        String
-  description  String
-  image        String?
-  requirements String[]
-  level        Levels     @default(beginner)
-  price        Int
-  ratings      Int
-  author       String
+  id                 Int                  @id @default(autoincrement())
+  title              String
+  description        String
+  image              String?
+  requirements       String[]
+  level              Levels               @default(beginner)
+  price              Int
+  ratings            Int
+  author             String
   userCourseProgress UserCourseProgress[]
-  chapters     Chapters[]
-  transactions Transactions[]
-  category_id  Int
-  category     Categories @relation(fields: [category_id], references: [id])
-  users        Users[]    @relation("UserToCourse")
-  isDeleted    Boolean    @default(false)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  chapters           Chapters[]
+  transactions       Transactions[]
+  category_id        Int
+  category           Categories           @relation(fields: [category_id], references: [id])
+  users              Users[]              @relation("UserToCourse")
+  isDeleted          Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
 }
 
 model Chapters {
   id        Int       @id @default(autoincrement())
   name      String
-  course_id Int       
+  course_id Int
   courses   Courses   @relation(fields: [course_id], references: [id])
   modules   Modules[]
 }
@@ -114,22 +113,35 @@ model UserCourseProgress {
   updatedAt    DateTime @updatedAt
 
   // Relationships
-  user         Users    @relation(fields: [userId], references: [id])
-  course       Courses  @relation(fields: [courseId], references: [id])
+  user   Users   @relation(fields: [userId], references: [id])
+  course Courses @relation(fields: [courseId], references: [id])
 }
 
 model Transactions {
-  id           Int      @id @default(autoincrement())
-  orderId      Int      @unique
-  userId       Int
-  courseId     Int
-  total_price  Int
-  status       String
+  id          Int      @id @default(autoincrement())
+  orderId     Int      @unique
+  userId      Int
+  courseId    Int
+  total_price Int
+  discount    Int      @default(0)
+  status      String
+  promo       Promo?   @relation(fields: [promoId], references: [id])
+  promoId     Int?
   payment_type String?  
   transaction_time DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user         Users    @relation(fields: [userId], references: [id])
-  course       Courses  @relation(fields: [courseId], references: [id])
+  user   Users   @relation(fields: [userId], references: [id])
+  course Courses @relation(fields: [courseId], references: [id])
+}
+
+model Promo {
+  id           Int            @id @default(autoincrement())
+  code_promo   String
+  discount     Int
+  expiresAt    DateTime
+  transactions Transactions[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
