@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const otpHandler = require('../libs/otpHandler');
 const nodemailer = require('../libs/nodemailer');
 const { registerUserSchema, createAdminSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema } = require('../validations/auth.validation');
-const { use } = require('../routes/auth.route');
 
 // login user
 const loginUser = async (req, res, next) => {
@@ -423,6 +422,69 @@ const resetPassword = async (req, res, next) => {
   }
 };
 
+const changePassword = async (req, res, next) => {
+  try {
+    const { old_password, new_password, confirm_password } = req.body;
+    const { email } = req.user; 
+
+    if (new_password !== confirm_password) {
+      return res.status(400).json({
+        status: false,
+        message: 'New password and confirm password do not match',
+        err: null,
+        data: null,
+      });
+    }
+
+    const user = await prisma.users.findUnique({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: 'User not found',
+        err: null,
+        data: null,
+      });
+    }
+
+    
+    const isMatch = await bcrypt.compare(old_password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({
+        status: false,
+        message: 'Old password is incorrect',
+        err: null,
+        data: null,
+      });
+    }
+
+    const encryptedNewPassword = await bcrypt.hash(new_password, 10);
+
+    await prisma.users.update({
+      where: {
+        email,
+      },
+      data: {
+        password: encryptedNewPassword,
+      },
+    });
+
+    return res.status(200).json({
+      status: true,
+      message: 'Password updated successfully',
+      err: null,
+      data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   loginUser,
   loginAdmin,
@@ -432,4 +494,5 @@ module.exports = {
   createAdmin,
   forgotPassword,
   resetPassword,
+  changePassword
 };

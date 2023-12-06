@@ -7,53 +7,98 @@ const snap = new Midtrans.Snap({
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
 
+function generateUniqueOrderId() {
+  const timestamp = new Date().getTime();
+  const randomPart = Math.floor(Math.random() * 10000);
+
+  const orderId = (timestamp * 10000 + randomPart) % 2147483647;
+
+  return orderId;
+}
+
 const checkout = async (req, res, next) => {
   try {
-    const { email, phone_number } = req.user;
-    const { courseId, courseName, price } = req.body;
-    if (!courseId || !courseName || !price) {
-      return res.status(400).json({
-        message: 'Please provide courseId, courseName, and price',
+    const { courseId, promoCode } = req.body;
+    const { nickname, email, phone_number, id } = req.user;
+
+    const course = await prisma.courses.findUnique({
+      where: { id: courseId },
+    });
+
+    if (!course) {
+      return res.status(404).json({
+        status: false,
+        message: 'Course not found',
       });
     }
-    console.log({ ...req.body });
+
+    let total_price = course.price;
+    let discount = 0;
+    let promoId = null;
+    if (promoCode) {
+      const promo = await prisma.promo.findUnique({
+        where: { code_promo: promoCode },
+      });
+      promoId = promo.id;
+      if (!promo) {
+        return res.status(400).json({
+          status: false,
+          message: 'Promo code not found',
+        });
+      }
+
+      if (promo.expiresAt < new Date()) {
+        return res.status(400).json({
+          status: false,
+          message: 'Promo code expired',
+        });
+      }
+
+      if (promo && promo.expiresAt > new Date()) {
+        // Menghitung diskon berdasarkan persentase
+        discount = (promo.discount / 100) * course.price;
+
+        // Mengurangkan diskon dari total_price
+        total_price -= discount;
+      }
+    }
     const parameter = {
       item_details: [
         {
-          id: courseId,
-          name: courseName,
-          price: Number(price),
+          id: course.id,
+          name: course.title,
+          price: Math.round(total_price),
           quantity: 1,
         },
       ],
       transaction_details: {
-        order_id: Math.round(Math.random() * 1000000000),
-        gross_amount: Number(price),
+        order_id: generateUniqueOrderId(),
+        gross_amount: Math.round(total_price),
       },
       customer_details: {
-        first_name: email,
+        first_name: nickname,
         email: email,
         phone: phone_number,
       },
     };
 
-    console.log('paramater', parameter);
-
     const token = await snap.createTransactionToken(parameter);
 
     const transaction = await prisma.transactions.create({
       data: {
+        userId: id,
+        courseId,
+        total_price,
+        discount,
+        status: 'Pending',
+        promoId: promoId ? promoId : null,
         orderId: parameter.transaction_details.order_id,
-        total_price: price,
-        courseId: courseId,
-        status: 'pending',
-        userId: req.user.id,
       },
     });
 
-    return res.status(200).json({
-      status: true,
-      message: 'Checkout success',
+    res.status(200).json({
+      success: true,
+      message: 'Checkout Successfully!',
       orderId: transaction.orderId,
       token: token,
     });
@@ -64,11 +109,8 @@ const checkout = async (req, res, next) => {
 
 const notification = async (req, res, next) => {
   try {
-    const { order_id, transaction_status } = req.body;
-    console.log({
-      order_id,
-      transaction_status,
-    });
+    const { order_id, transaction_status, payment_type, transaction_time } = req.body;
+
     const transaction = await prisma.transactions.findUnique({
       where: {
         orderId: Number(order_id),
@@ -77,12 +119,28 @@ const notification = async (req, res, next) => {
 
     if (transaction) {
       if (transaction_status === 'settlement') {
-        await prisma.transactions.update({
+        const transaction = await prisma.transactions.update({
           where: {
             orderId: Number(order_id),
           },
           data: {
             status: 'paid',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
+          },
+        });
+
+        // set course to user
+        await prisma.users.update({
+          where: {
+            id: transaction.userId,
+          },
+          data: {
+            courses: {
+              connect: {
+                id: transaction.courseId,
+              },
+            },
           },
         });
       } else if (transaction_status === 'cancel') {
@@ -92,6 +150,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'cancelled',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       } else if (transaction_status === 'expire') {
@@ -101,6 +161,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'expired',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       } else if (transaction_status === 'deny') {
@@ -110,6 +172,8 @@ const notification = async (req, res, next) => {
           },
           data: {
             status: 'failed',
+            payment_type: payment_type,
+            transaction_time: new Date(transaction_time),
           },
         });
       }
