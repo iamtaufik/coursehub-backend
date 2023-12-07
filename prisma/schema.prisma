@@ -8,7 +8,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  // directUrl = env("DIRECT_URL")
 }
 
 enum Levels {
@@ -35,6 +35,7 @@ model Users {
   courses            Courses[]            @relation("UserToCourse")
   transactions       Transactions[]
   profile            Profiles?
+  notifications      Notification[]
   userCourseProgress UserCourseProgress[]
   isVerified         Boolean              @default(false)
   createdAt          DateTime             @default(now())
@@ -145,3 +146,18 @@ model Promo {
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 }
+
+// user spesifik
+model Notification {
+  id        Int      @id @default(autoincrement())
+  notificationId Int  
+  userId    Int
+  user      Users    @relation(fields: [userId], references: [id])
+  title     String
+  body      String
+  description String?
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
