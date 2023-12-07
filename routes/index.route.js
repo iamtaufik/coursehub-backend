@@ -8,5 +8,6 @@ router.use('/transactions', require('./transaction.route'));
 router.use('/profile', require('./profile.route'));
 router.use('/', require('./dashboard.route'));
 router.use('/promo', require('./promo.route'));
+router.use('/notification', require('./notification.route'));
 
 module.exports = router;

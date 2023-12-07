@@ -411,6 +411,15 @@ const resetPassword = async (req, res, next) => {
       },
     });
 
+    await prisma.notification.create({
+      data: {
+        title: 'Notifikasi',
+        notificationId: Math.floor(Math.random() * 1000000),
+        body: 'Password berhasil diubah',
+        userId: decode.id,
+      },
+    });
+
     return res.status(200).json({
       status: true,
       message: 'Password updated successfully!',
@@ -425,7 +434,7 @@ const resetPassword = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   try {
     const { old_password, new_password, confirm_password } = req.body;
-    const { email } = req.user; 
+    const { email } = req.user;
 
     if (new_password !== confirm_password) {
       return res.status(400).json({
@@ -451,7 +460,6 @@ const changePassword = async (req, res, next) => {
       });
     }
 
-    
     const isMatch = await bcrypt.compare(old_password, user.password);
 
     if (!isMatch) {
@@ -471,6 +479,15 @@ const changePassword = async (req, res, next) => {
       },
       data: {
         password: encryptedNewPassword,
+      },
+    });
+
+    await prisma.notification.create({
+      data: {
+        title: 'Notifikasi',
+        notificationId: Math.floor(Math.random() * 1000000),
+        body: 'Password berhasil diubah',
+        userId: user.id,
       },
     });
 
@@ -494,5 +511,5 @@ module.exports = {
   createAdmin,
   forgotPassword,
   resetPassword,
-  changePassword
+  changePassword,
 };
