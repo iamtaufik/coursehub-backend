@@ -19,3 +19,8 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
+      - name: Prisma migrate
+        run: npx prisma migrate deploy
+        env: 
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DIRECT_URL: ${{ secrets.DIRECT_DATABASE_URL }}
