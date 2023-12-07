@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const otpHandler = require('../libs/otpHandler');
 const nodemailer = require('../libs/nodemailer');
-const { registerUserSchema, createAdminSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema } = require('../validations/auth.validation');
+const { registerUserSchema, createAdminSchema, forgotPasswordSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema, resetPasswordSchema, changePasswordSchema } = require('../validations/auth.validation');
 
 // login user
 const loginUser = async (req, res, next) => {
@@ -148,7 +148,7 @@ const register = async (req, res, next) => {
     delete users.password;
 
     const otp = await otpHandler.generateOTP(email);
-    const html = `Your OTP for account activation is: <strong>${otp}</strong>`;
+    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}">Klik disini untuk aktifasi akun</a>`;
     await nodemailer.sendEmail(email, 'Account Activation OTP', html);
 
     return res.status(201).json({
@@ -337,6 +337,8 @@ const forgotPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
 
+    await forgotPasswordSchema.validateAsync({ ...req.body });
+
     const user = await prisma.users.findUnique({ where: { email } });
 
     if (!user) {
@@ -393,6 +395,8 @@ const resetPassword = async (req, res, next) => {
 
     const { password, confirm_password } = req.body;
 
+    await resetPasswordSchema.validateAsync({ ...req.body });
+
     if (password !== confirm_password) {
       return res.status(400).json({
         status: false,
@@ -435,6 +439,8 @@ const changePassword = async (req, res, next) => {
   try {
     const { old_password, new_password, confirm_password } = req.body;
     const { email } = req.user;
+
+    await changePasswordSchema.validateAsync({ ...req.body });
 
     if (new_password !== confirm_password) {
       return res.status(400).json({

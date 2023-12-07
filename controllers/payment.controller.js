@@ -1,5 +1,6 @@
 const Midtrans = require('midtrans-client');
 const prisma = require('../libs/prisma');
+const { createPaymentSchema, createNotificationPaymentSchema } = require('../validations/payment.validation');
 
 const snap = new Midtrans.Snap({
   isProduction: false,
@@ -21,8 +22,10 @@ const checkout = async (req, res, next) => {
     const { courseId, promoCode } = req.body;
     const { nickname, email, phone_number, id } = req.user;
 
+    await createPaymentSchema.validateAsync({ ...req.body, nickname, email, phone_number, id });
+
     const course = await prisma.courses.findUnique({
-      where: { id: courseId },
+      where: { id: courseId, AND: { isDeleted: false } },
     });
 
     if (!course) {
@@ -39,13 +42,14 @@ const checkout = async (req, res, next) => {
       const promo = await prisma.promo.findUnique({
         where: { code_promo: promoCode },
       });
-      promoId = promo.id;
       if (!promo) {
         return res.status(400).json({
           status: false,
           message: 'Promo code not found',
         });
       }
+
+      promoId = promo.id;
 
       if (promo.expiresAt < new Date()) {
         return res.status(400).json({
@@ -110,6 +114,8 @@ const checkout = async (req, res, next) => {
 const notification = async (req, res, next) => {
   try {
     const { order_id, transaction_status, payment_type, transaction_time } = req.body;
+
+    await createNotificationPaymentSchema.validateAsync({ ...req.body });
 
     const transaction = await prisma.transactions.findUnique({
       where: {

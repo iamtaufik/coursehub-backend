@@ -17,6 +17,7 @@ const getCategories = async (req, res, next) => {
 
 const getCourseByCategory = async (req, res, next) => {
   try {
+    await getCategoriesSchema.validateAsync({...req.params});
     const id = parseInt(req.params.id);
 
     const category = await prisma.categories.findUnique({

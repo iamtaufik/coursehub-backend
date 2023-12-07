@@ -5,15 +5,8 @@ const { getPagination } = require('../libs/getPaggination');
 const createCourse = async (req, res, next) => {
   const { title, description, price, image, chapters, requirements, author, level } = req.body;
   try {
-    const { error } = createCourseSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        status: false,
-        message: 'Validation Error',
-        err: error.details[0].message,
-        data: null,
-      });
-    }
+    await createCourseSchema.validateAsync({ ...req.body });
+
     const course = await prisma.courses.create({
       data: {
         title,
@@ -226,15 +219,7 @@ const updateCourse = async (req, res, next) => {
   try {
     const course_id = parseInt(req.params.id);
 
-    const { error } = updateCourseSchema.validate(req.body);
-    if (error) {
-      return res.status(400).json({
-        success: false,
-        message: 'Validation Error',
-        error: error.details[0].message,
-        data: null,
-      });
-    }
+    await updateCourseSchema.validateAsync({...req.body});
 
     const existingCourse = await prisma.courses.findUnique({
       where: {

@@ -1,9 +1,11 @@
 const prisma = require('../libs/prisma');
-
+const { createPromoSchema, updatePromoSchema } = require('../validations/promo.validation');
 
 const createPromo = async (req, res, next) => {
   try {
     const { code_promo, discount, expiresAt } = req.body;
+
+    await createPromoSchema.validateAsync({ ...req.body });
 
     const newPromo = await prisma.promo.create({
       data: {
@@ -12,6 +14,26 @@ const createPromo = async (req, res, next) => {
         expiresAt: new Date(expiresAt),
       },
     });
+
+    const users = await prisma.users.findMany();
+
+    const notificationId = Math.floor(Math.random() * 1000000000);
+
+    const blastNotification = users.map((user) => {
+      return {
+        userId: user.id,
+        notificationId,
+        title: 'Promo',
+        body: `Gunakan kode ${code_promo} berikut untuk mendapatkan diskon ${discount}%`,
+        description: 'Syarat dan ketentuan berlaku',
+      };
+    });
+
+    await prisma.$transaction([
+      prisma.notification.createMany({
+        data: blastNotification,
+      }),
+    ]);
 
     res.status(201).json({
       status: true,
@@ -34,7 +56,6 @@ const getPromo = async (req, res, next) => {
         data: null,
       });
     }
-
 
     res.status(200).json({
       status: true,
@@ -76,6 +97,8 @@ const updatePromo = async (req, res, next) => {
   try {
     const promoId = parseInt(req.params.id, 10);
     const { code_promo, discount, expiresAt } = req.body;
+
+    await updatePromoSchema.validateAsync({ ...req.body });
 
     const existingPromo = await prisma.promo.findUnique({
       where: { id: promoId },
