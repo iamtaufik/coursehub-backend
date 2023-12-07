@@ -18,6 +18,8 @@ servers:
 tags:
   - name: Users
     description: Operations related to auth Users
+  - name: Profile
+    description: Operations related to auth Profile
   - name: Admin
     description: Operations related to auth Admin
   - name: Count Dashboard Admin
@@ -26,6 +28,8 @@ tags:
     description: Operations related to Course
   - name: Category
     description: Operations related to Category
+  - name: Promo
+    description: Operations related to Promo
   - name: Payment
     description: Operations related to Payment
   - name: Transaction
@@ -170,6 +174,114 @@ paths:
 
       security:
         - bearerAuth: []
+        
+        
+  /auth/change-password:
+    put:
+      tags:
+        - Users
+      operationId: put-change-password
+      summary: Change Password
+      description: Update user password, input old password, new password, confirm new password.
+      requestBody:
+        $ref: '#/components/requestBodies/createChangePassword'
+      responses:
+        '200':
+          description: Password updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChangePasswordModel'
+                        
+      security:
+        - bearerAuth: []
+        
+        
+  /profile:
+    get:
+      tags:
+        - Profile
+      operationId: get-detail-profile
+      summary: Get Detail Profile
+      description: Retrieves a list of detail profile.
+      responses:
+        '200':
+          description: Promo retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                        
+      security:
+        - bearerAuth: []
+
+    put:
+      tags:
+        - Profile
+      operationId: put-update-profile
+      summary: Update Profile Details
+      description: Updates details of a specific profile.
+      requestBody:
+        $ref: '#/components/requestBodies/updateProfile'
+      responses:
+        '200':
+          description: Profile updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+      security:
+        - bearerAuth: []
+        
+        
+  /profile/:      
+    put:
+      tags:
+        - Profile
+      operationId: put-update-profile-image
+      summary: Update Profile Image
+      description: Updates Profile Image.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_image:
+                  type: string
+                  example: 'Upload File Image'
+      responses:
+        '200':
+          description: Profile updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+      security:
+        - bearerAuth: []
+        
+        
+        
+        
 
   /auth/admin/register:
     post:
@@ -248,35 +360,7 @@ paths:
                         example: Unauthorized
       security:
         - bearerAuth: []
-  
-  /auth/change-password:
-    put:
-      tags:
-        - Users
-      operationId: put-change-password
-      summary: Change Password
-      description: Update user password, input old password, new password, confirm new password.
-      parameters:
-        - in: query
-          name: token
-          schema:
-            type: string
-          required: true
-          description: Token received after successful login.
-      requestBody:
-        $ref: '#/components/requestBodies/createChangePassword'
-      responses:
-        '200':
-          description: Password updated successfully!
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-                  - type: object
-                    properties:
-                      data:
-                        $ref: '#/components/schemas/ChangePasswordModel'
+        
         
   /activeUsers:
     get:
@@ -610,6 +694,150 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/CourseModel'
+                        
+                        
+  /promo:
+    post:
+      tags:
+        - Promo
+      operationId: post-promo
+      summary: Create New Promo
+      description: Create Data Promo
+      requestBody:
+        $ref: '#/components/requestBodies/createPromo'
+      responses:
+        '201':
+          description: Promo created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PromoModel'
+
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - Promo
+      operationId: get-fetch-all-promo
+      summary: Get all Promo
+      description: Retrieves a list of all registered promo.
+      responses:
+        '200':
+          description: Promo retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          courses:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/PromoModel'
+                            
+      security:
+        - bearerAuth: []
+
+  '/promo/{id}':
+    get:
+      tags:
+        - Promo
+      operationId: get-detail-promo
+      summary: Get Detail Promo
+      description: Retrieves a list of detail promo.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Promo to retrieve.
+      responses:
+        '200':
+          description: Promo retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PromoModel'
+                        
+      security:
+        - bearerAuth: []
+
+    put:
+      tags:
+        - Promo
+      operationId: put-update-promo
+      summary: Update Promo Details
+      description: Updates details of a specific promo.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the promo to update.
+      requestBody:
+        $ref: '#/components/requestBodies/createPromo'
+      responses:
+        '200':
+          description: Promo updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+      security:
+        - bearerAuth: []
+
+    delete:
+      tags:
+        - Promo
+      operationId: delete-remove-promo
+      summary: Delete Promo
+      description: Deletes a specific promo.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the promo to delete.
+      responses:
+        '200':
+          description: Successful promo deletion
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+
+      security:
+        - bearerAuth: []
 
   /payment/checkout:
     post:
@@ -933,6 +1161,21 @@ components:
         category_id:
           type: integer
           example: 1
+          
+    PromoModel:
+      title: Promo
+      type: object
+      properties:
+        code_promo:
+          type: string
+          example: 'PROMOHARIPAHLAWAN'
+        discount:
+          type: integer
+          example: 30
+        expiresAt:
+          type: string
+          example: '2023-12-05T23:59:59.999Z'
+
 
     Pagination:
       title: Pagination
@@ -973,12 +1216,10 @@ components:
               courseId:
                 type: integer
                 example: 1
-              courseName:
+              promoCode:
                 type: string
-                example: 'course beginner 1'
-              price:
-                type: integer
-                example: 150000
+                example: 'HARIPAHLAWAN'
+                
     createRegister:
       content:
         application/json:
@@ -1079,7 +1320,7 @@ components:
           schema:
             type: object
             properties:
-              password:
+              old_password:
                 type: string
                 example: '*********'
               new_password:
@@ -1212,3 +1453,46 @@ components:
                             type: string
                             format: uri
                             example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+                            
+                            
+    createPromo:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code_promo:
+                type: string
+                example: 'PROMOHARIPAHLAWAN'
+              discount:
+                type: integer
+                example: 30
+              expiresAt:
+                type: string
+                example: '2023-12-05T23:59:59.999Z'
+                
+                
+    updateProfile:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              phone_number:
+                type: string
+                example: '62829932992'
+              first_name:
+                type: string
+                example: 'User'
+              last_name:
+                type: string
+                example: 'Test'
+              profile_image:
+                type: string
+                example: 'Upload File Image'
+              city:
+                type: string
+                example: 'Jawa Tengah'
+              country:
+                type: string
+                example: 'Indonesia'
