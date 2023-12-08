@@ -1023,7 +1023,7 @@ paths:
     get:
       tags:
         - Notification
-      operationId: get-fetch-all-notification
+      operationId: get-fetch-all-notification-admin
       summary: Get all Notification Admin Only
       description: Retrieves a list of all registered notification.
 
