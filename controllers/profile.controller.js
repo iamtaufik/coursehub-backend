@@ -1,16 +1,17 @@
-const path = require("path");
-const imagekit = require("../libs/imagekit");
-const prisma = require("../libs/prisma");
+const path = require('path');
+const imagekit = require('../libs/imagekit');
+const prisma = require('../libs/prisma');
+const { createProfileSchema } = require('../validations/profile.validation');
 
 function toIndonesianPhoneNumber(phoneNumber) {
-  let digitsOnly = phoneNumber.replace(/\D/g, "");
+  let digitsOnly = phoneNumber.replace(/\D/g, '');
 
-  if (digitsOnly.startsWith("0")) {
-    return "+62" + digitsOnly.substring(1);
+  if (digitsOnly.startsWith('0')) {
+    return '+62' + digitsOnly.substring(1);
   }
 
-  if (!digitsOnly.startsWith("62")) {
-    return "+62" + digitsOnly;
+  if (!digitsOnly.startsWith('62')) {
+    return '+62' + digitsOnly;
   }
 
   return digitsOnly;
@@ -21,6 +22,8 @@ const updateProfile = async (req, res, next) => {
   const { phone_number, first_name, last_name, city, country } = req.body;
   const file = req.file;
   try {
+    await createProfileSchema.validateAsync({ ...req.body });
+
     let user = await prisma.users.findUnique({
       where: {
         id,
@@ -30,7 +33,7 @@ const updateProfile = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
         err: null,
         data: null,
       });
@@ -42,12 +45,10 @@ const updateProfile = async (req, res, next) => {
       },
     });
 
-    let indonesianPhoneNumber = phone_number
-      ? toIndonesianPhoneNumber(phone_number)
-      : profile.phone_number;
+    let indonesianPhoneNumber = phone_number ? toIndonesianPhoneNumber(phone_number) : profile.phone_number;
 
     if (file) {
-      let strFile = file.buffer.toString("base64");
+      let strFile = file.buffer.toString('base64');
       let { url } = await imagekit.upload({
         fileName: Date.now() + path.extname(file.originalname),
         file: strFile,
@@ -69,7 +70,7 @@ const updateProfile = async (req, res, next) => {
 
       return res.status(200).json({
         success: true,
-        message: "Successfully updated user profile",
+        message: 'Successfully updated user profile',
         err: null,
         data: updateProfileUser,
       });
@@ -91,18 +92,12 @@ const updateProfile = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Successfully updated user profile",
+      message: 'Successfully updated user profile',
       err: null,
       data: updateProfileUser,
     });
   } catch (error) {
-    next();
-    return res.status(500).json({
-      success: false,
-      message: "Failed to update user profile",
-      err: error.message,
-      data: null,
-    });
+    next(error);
   }
 };
 
@@ -118,7 +113,7 @@ const getProfile = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: 'User not found',
         err: null,
         data: null,
       });
@@ -133,7 +128,7 @@ const getProfile = async (req, res, next) => {
     if (!profile) {
       return res.status(404).json({
         success: false,
-        message: "Profile not found",
+        message: 'Profile not found',
         err: null,
         data: null,
       });
@@ -141,7 +136,7 @@ const getProfile = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Successfully get user profile",
+      message: 'Successfully get user profile',
       err: null,
       data: profile,
     });
@@ -149,7 +144,7 @@ const getProfile = async (req, res, next) => {
     next();
     return res.status(500).json({
       success: false,
-      message: "Failed to get user profile",
+      message: 'Failed to get user profile',
       err: err.message,
       data: null,
     });

@@ -40,7 +40,7 @@ const countPremiumClass = async (req, res, next) => {
   try {
     const { _count } = await prisma.courses.aggregate({
       _count: { id: true },
-      where: { price: { not: 0 } }
+      where: { price: { not: 0 }, AND: { isDeleted: false } }
     });
 
     res.status(200).json({
