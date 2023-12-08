@@ -219,7 +219,7 @@ const updateCourse = async (req, res, next) => {
   try {
     const course_id = parseInt(req.params.id);
 
-    await updateCourseSchema.validateAsync({...req.body});
+    await updateCourseSchema.validateAsync({ ...req.body });
 
     const existingCourse = await prisma.courses.findUnique({
       where: {
@@ -374,30 +374,37 @@ const getDetailCourses = async (req, res, next) => {
 const joinCourse = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { email } = req.body;
+    const { email } = req.user;
 
-    await joinCourseSchema.validateAsync({ ...req.params, ...req.body });
+    // await joinCourseSchema.validateAsync({ ...req.params, ...req.body });
 
     const course = await prisma.courses.findUnique({
       where: {
         id: Number(id),
         AND: { isDeleted: false },
       },
+      include: {
+        chapters: {
+          include: {
+            modules: true,
+          },
+        },
+      },
     });
-
-    if (course.price > 0) {
-      return res.status(400).json({
-        status: false,
-        message: 'Bad Request',
-        data: 'Courses not free',
-      });
-    }
 
     if (!course) {
       return res.status(404).json({
         status: false,
         message: 'Course not found',
         data: null,
+      });
+    }
+
+    if (course.price > 0) {
+      return res.status(400).json({
+        status: false,
+        message: 'Bad Request',
+        data: 'Courses not free',
       });
     }
 
@@ -447,6 +454,21 @@ const joinCourse = async (req, res, next) => {
         },
       },
     });
+    const temp = course.chapters.map((chapter) =>
+      chapter.modules.map((module) => ({
+        userId: Number(req.user.id),
+        moduleId: Number(module.id),
+        isCompleted: false,
+      }))
+    );
+
+    // console.log(temp);
+
+    await prisma.$transaction([
+      prisma.userCourseProgress.createMany({
+        data: temp.flat(),
+      }),
+    ]);
 
     res.status(201).json({
       status: true,
@@ -485,6 +507,100 @@ const myCourse = async (req, res, next) => {
   }
 };
 
+const getDetailMyCourse = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.user;
+
+    const course = await prisma.courses.findUnique({
+      where: {
+        id: Number(id),
+        AND: { isDeleted: false },
+      },
+    });
+
+    if (!course) {
+      return res.status(404).json({
+        status: false,
+        message: 'Course not found',
+        data: null,
+      });
+    }
+
+    const checkJoin = await prisma.users.findFirst({
+      where: {
+        email,
+        courses: {
+          some: {
+            id: Number(id),
+          },
+        },
+      },
+    });
+
+    if (!checkJoin) {
+      return res.status(403).json({
+        status: false,
+        message: 'User not join this course',
+        data: null,
+      });
+    }
+
+    const myDetailCourse = await prisma.users.findFirst({
+      where: {
+        email,
+      },
+      select: {
+        courses: {
+          where: {
+            id: Number(id),
+            AND: {
+              isDeleted: false,
+            },
+          },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            author: true,
+            requirements: true,
+            chapters: {
+              select: {
+                id: true,
+                name: true,
+                modules: {
+                  select: {
+                    id: true,
+                    title: true,
+                    duration: true,
+                    url: true,
+                    userCourseProgress: {
+                      where: {
+                        userId: { equals: Number(req.user.id) },
+                      },
+                      select: {
+                        isCompleted: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: true,
+      message: 'Detail Courses!',
+      data: { ...myDetailCourse.courses[0] },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   createCourse,
   getCourses,
@@ -493,4 +609,5 @@ module.exports = {
   getDetailCourses,
   updateCourse,
   deleteCourse,
+  getDetailMyCourse,
 };

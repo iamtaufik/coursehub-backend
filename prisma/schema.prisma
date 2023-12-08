@@ -8,7 +8,7 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  // directUrl = env("DIRECT_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Levels {
@@ -73,7 +73,6 @@ model Courses {
   price              Int
   ratings            Int
   author             String
-  userCourseProgress UserCourseProgress[]
   chapters           Chapters[]
   transactions       Transactions[]
   category_id        Int
@@ -99,23 +98,19 @@ model Modules {
   url        String
   chapter_id Int
   chapters   Chapters @relation(fields: [chapter_id], references: [id])
+  userCourseProgress UserCourseProgress[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
 
 model UserCourseProgress {
-  id           Int      @id @default(autoincrement())
-  userId       Int
-  courseId     Int
-  completed    Boolean  @default(false)
-  progress     Float    @default(0) // Misalkan menggunakan nilai 0-100 untuk progress
-  lastAccessed DateTime @updatedAt
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relationships
-  user   Users   @relation(fields: [userId], references: [id])
-  course Courses @relation(fields: [courseId], references: [id])
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  moduleId   Int
+  isCompleted Boolean   @default(false)
+  
+  user       Users     @relation(fields: [userId], references: [id])
+  module     Modules   @relation(fields: [moduleId], references: [id])
 }
 
 model Transactions {

@@ -34,6 +34,8 @@ tags:
     description: Operations related to Payment
   - name: Transaction
     description: Operations related to Transaction
+  - name: Notification
+    description: Operations related to Notification
 paths:
   /auth/register:
     post:
@@ -174,8 +176,7 @@ paths:
 
       security:
         - bearerAuth: []
-        
-        
+
   /auth/change-password:
     put:
       tags:
@@ -197,11 +198,10 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/ChangePasswordModel'
-                        
+
       security:
         - bearerAuth: []
-        
-        
+
   /profile:
     get:
       tags:
@@ -218,7 +218,7 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/BasicResponse'
                   - type: object
-                        
+
       security:
         - bearerAuth: []
 
@@ -245,9 +245,8 @@ paths:
 
       security:
         - bearerAuth: []
-        
-        
-  /profile/:      
+
+  /profile/:
     put:
       tags:
         - Profile
@@ -278,10 +277,6 @@ paths:
 
       security:
         - bearerAuth: []
-        
-        
-        
-        
 
   /auth/admin/register:
     post:
@@ -360,8 +355,7 @@ paths:
                         example: Unauthorized
       security:
         - bearerAuth: []
-        
-        
+
   /activeUsers:
     get:
       tags:
@@ -380,8 +374,7 @@ paths:
                   - type: object
       security:
         - bearerAuth: []
-        
-        
+
   /activeClass:
     get:
       tags:
@@ -401,8 +394,7 @@ paths:
 
       security:
         - bearerAuth: []
-        
-        
+
   /premiumClass:
     get:
       tags:
@@ -599,7 +591,7 @@ paths:
       security:
         - bearerAuth: []
 
-  '/courses/{id}/join':
+  /courses/{id}/join:
     put:
       tags:
         - Course
@@ -613,8 +605,6 @@ paths:
             type: integer
           required: true
           description: The ID of the Course to retrieve.
-      requestBody:
-        $ref: '#/components/requestBodies/createForgotPassword'
       responses:
         '201':
           description: Join course successfully!
@@ -694,8 +684,7 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/CourseModel'
-                        
-                        
+
   /promo:
     post:
       tags:
@@ -744,7 +733,7 @@ paths:
                             type: array
                             items:
                               $ref: '#/components/schemas/PromoModel'
-                            
+
       security:
         - bearerAuth: []
 
@@ -774,7 +763,7 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/PromoModel'
-                        
+
       security:
         - bearerAuth: []
 
@@ -927,7 +916,7 @@ paths:
 
       security:
         - bearerAuth: []
-        
+
   /transaction/me:
     get:
       tags:
@@ -974,6 +963,107 @@ paths:
       security:
         - bearerAuth: []
 
+  /notification:
+    post:
+      tags:
+        - Notification
+      operationId: post-notification
+      summary: Create New Notification
+      description: Create Data Notification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - body
+              properties:
+                title:
+                  type: string
+                  example: 'Promo'
+                body:
+                  type: string
+                  example: 'Gunakan kode promo HARIPAHLAWAN untuk mendapatkan diskon 30% untuk semua kursus'
+                description:
+                  type: string
+                  example: 'syarat dan ketentuan berlaku'
+      responses:
+        '201':
+          description: Notification created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - Notification
+      operationId: get-fetch-all-notification
+      summary: Get all Notification
+      description: Retrieves a list of all registered notification.
+
+      responses:
+        '200':
+          description: Notification retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /notification/all:
+    get:
+      tags:
+        - Notification
+      operationId: get-fetch-all-notification
+      summary: Get all Notification Admin Only
+      description: Retrieves a list of all registered notification.
+
+      responses:
+        '200':
+          description: Notification retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /notification/{id}:
+    delete:
+      tags:
+        - Notification
+      operationId: delete-remove-notification
+      summary: Delete Notification Admin Only
+      description: Deletes a specific notification.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the notification to delete.
+      responses:
+        '200':
+          description: Successful notification deletion
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
 components:
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
@@ -1161,7 +1251,7 @@ components:
         category_id:
           type: integer
           example: 1
-          
+
     PromoModel:
       title: Promo
       type: object
@@ -1175,7 +1265,6 @@ components:
         expiresAt:
           type: string
           example: '2023-12-05T23:59:59.999Z'
-
 
     Pagination:
       title: Pagination
@@ -1219,7 +1308,7 @@ components:
               promoCode:
                 type: string
                 example: 'HARIPAHLAWAN'
-                
+
     createRegister:
       content:
         application/json:
@@ -1453,8 +1542,7 @@ components:
                             type: string
                             format: uri
                             example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
-                            
-                            
+
     createPromo:
       content:
         application/json:
@@ -1470,8 +1558,7 @@ components:
               expiresAt:
                 type: string
                 example: '2023-12-05T23:59:59.999Z'
-                
-                
+
     updateProfile:
       content:
         application/json:
