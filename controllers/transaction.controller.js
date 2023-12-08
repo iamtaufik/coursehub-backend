@@ -6,6 +6,8 @@ const getTransactions = async (req, res, next) => {
     if (req.query.page && req.query.limit) {
       const { page = 1, limit = 10 } = req.query;
 
+      const sort = req.query.sort ? req.query.sort : 'asc';
+
       const transactions = await prisma.transactions.findMany({
         skip: (Number(page) - 1) * Number(limit),
         take: Number(limit),
@@ -27,6 +29,9 @@ const getTransactions = async (req, res, next) => {
               email: true,
             },
           },
+        },
+        orderBy: {
+          createdAt: sort === 'asc' ? 'asc' : 'desc',
         },
       });
 
@@ -93,6 +98,9 @@ const myTransaction = async (req, res, next) => {
             title: true,
           },
         },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
 

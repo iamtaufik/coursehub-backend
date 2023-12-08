@@ -1,8 +1,11 @@
 const prisma = require('../libs/prisma');
+const { createNotificationSchema, deleteNotificationSchema } = require('../validations/notification.validation');
 
 const createNotification = async (req, res, next) => {
   try {
     const { title, description, body } = req.body;
+
+    await createNotificationSchema.validateAsync({ ...req.body });
 
     const users = await prisma.users.findMany();
 
@@ -84,6 +87,8 @@ const deleteNotification = async (req, res, next) => {
   try {
     const { id } = req.params;
 
+    await deleteNotificationSchema.validateAsync({ ...req.params });
+
     const notification = await prisma.$transaction([
       prisma.notification.updateMany({
         where: {
@@ -105,4 +110,4 @@ const deleteNotification = async (req, res, next) => {
   }
 };
 
-module.exports = { getMyNotifications,getAllNotifications, createNotification, deleteNotification };
+module.exports = { getMyNotifications, getAllNotifications, createNotification, deleteNotification };
