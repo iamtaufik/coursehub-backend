@@ -30,8 +30,9 @@ model Users {
   id                 Int                  @id @default(autoincrement())
   nickname           String
   email              String               @unique
-  password           String
+  password           String?
   otp                String?
+  googleId           String?
   courses            Courses[]            @relation("UserToCourse")
   transactions       Transactions[]
   profile            Profiles?

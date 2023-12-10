@@ -43,6 +43,13 @@ const loginUser = async (req, res, next) => {
       });
     }
 
+    if(user.googleId){
+      return res.status(400).json({
+        success: false,
+        message: 'Use google login',
+      })
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -146,9 +153,18 @@ const register = async (req, res, next) => {
       },
     });
     delete users.password;
+    const token = jwt.sign(
+      {
+        email: users.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1d',
+      }
+    );
 
     const otp = await otpHandler.generateOTP(email);
-    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}">Klik disini untuk aktifasi akun</a>`;
+    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
     await nodemailer.sendEmail(email, 'Account Activation OTP', html);
 
     return res.status(201).json({
@@ -225,13 +241,32 @@ const loginAdmin = async (req, res, next) => {
   }
 };
 
-const authenticate = (req, res, next) => {
-  return res.status(200).json({
-    status: true,
-    message: 'OK',
-    err: null,
-    data: { user: req.user },
-  });
+const authenticate = async (req, res, next) => {
+  try {
+    const { user } = req;
+
+    delete user.password;
+    console.log(user);
+    const userDetail = await prisma.users.findUnique({
+      where: {
+        email: user.email,
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    delete userDetail.password;
+
+    return res.status(200).json({
+      status: true,
+      message: 'OK',
+      err: null,
+      data: { ...userDetail },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const createAdmin = async (req, res, next) => {
@@ -276,25 +311,26 @@ const createAdmin = async (req, res, next) => {
   }
 };
 
-const verifyOTP = async (req, res) => {
+const verifyOTP = async (req, res, next) => {
   try {
-    const { email, otp } = req.body;
+    const { token, otp } = req.query;
 
-    const { value, error } = await verifyOTPSchema.validateAsync({
-      email,
-      otp,
+    await verifyOTPSchema.validateAsync({
+      ...req.query,
     });
 
-    if (error) {
+    const decode = jwt.decode(token, process.env.JWT_SECRET);
+
+    if (!decode) {
       return res.status(400).json({
         status: false,
-        message: 'Bad Request',
-        err: error.message,
+        message: 'Bad request',
+        err: 'Invalid token',
         data: null,
       });
     }
 
-    const user = await prisma.users.findUnique({ where: { email } });
+    const user = await prisma.users.findUnique({ where: { email: decode.email } });
 
     if (!user) {
       return res.status(404).json({
@@ -305,7 +341,7 @@ const verifyOTP = async (req, res) => {
       });
     }
 
-    const storedOTP = await otpHandler.getOTPFromStorage(email);
+    const storedOTP = await otpHandler.getOTPFromStorage(decode.email);
 
     if (otp !== storedOTP) {
       return res.status(400).json({
@@ -318,7 +354,7 @@ const verifyOTP = async (req, res) => {
 
     // OTP yang sesuai, tandai verifikasi pengguna di sini jika perlu
     await prisma.users.update({
-      where: { email },
+      where: { email: decode.email },
       data: { isVerified: true, otp: null },
     });
 
@@ -508,6 +544,72 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+const resendOTP = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    await forgotPasswordSchema.validateAsync({ ...req.body });
+
+    const user = await prisma.users.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: 'User not found',
+        err: null,
+        data: null,
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        status: false,
+        message: 'User already verified',
+        err: null,
+        data: null,
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '7d',
+      }
+    );
+
+    const otp = await otpHandler.generateOTP(email);
+    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
+    await nodemailer.sendEmail(email, 'Account Activation OTP', html);
+
+    return res.json({
+      status: true,
+      message: 'OTP sent to email successfully',
+      err: null,
+      data: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const loginGoogle = async (req, res, next) => {
+  try {
+    let token = jwt.sign({ id: req.user.id, nickname: req.user.nickname, email: req.user.email }, process.env.JWT_SECRET);
+
+    return res.status(200).json({
+      success: true,
+      message: 'OK',
+      err: null,
+      data: { ...req.user, token },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   loginUser,
   loginAdmin,
@@ -518,4 +620,6 @@ module.exports = {
   forgotPassword,
   resetPassword,
   changePassword,
+  resendOTP,
+  loginGoogle,
 };

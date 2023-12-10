@@ -66,8 +66,19 @@ paths:
       operationId: post-verify-otp
       summary: Verify OTP (OTP Aktivasi)
       description: Verify otp after account registration
-      requestBody:
-        $ref: '#/components/requestBodies/createOtp'
+      parameters:
+        - in: query
+          name: otp
+          schema:
+            type: string
+          required: true
+          description: Enter the otp code sent from the email, OTP code to activate the account.
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: Enter the token .
       responses:
         '201':
           description: Account activated successfully!.
@@ -80,6 +91,33 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/VerifyOtpModel'
+
+  /auth/resend-otp:
+    post:
+      tags:
+        - Users
+      operationId: post-resend-otp
+      summary: Resend OTP (OTP Aktivasi)
+      description: Resend otp after account registration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  example: 'usertest01@gmail.com'
+      responses:
+        '201':
+          description: Account activated successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
 
   /auth/login:
     post:
@@ -355,6 +393,38 @@ paths:
                         example: Unauthorized
       security:
         - bearerAuth: []
+
+  /auth/google:
+    get:
+      tags:
+        - Users
+      operationId: get-google-auth
+      summary: Google Auth
+      description: Google Auth
+      responses:
+        '200':
+          description: Google Auth success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+  
+  /auth/google/callback:
+    get:
+      tags:
+        - Users
+      operationId: get-google-auth-callback
+      summary: Google Auth Callback
+      description: Google Auth Callback
+      responses:
+        '200':
+          description: Google Auth Callback success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
 
   /activeUsers:
     get:
