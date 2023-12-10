@@ -146,9 +146,18 @@ const register = async (req, res, next) => {
       },
     });
     delete users.password;
+    const token = jwt.sign(
+      {
+        email: users.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '1d',
+      }
+    );
 
     const otp = await otpHandler.generateOTP(email);
-    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}">Klik disini untuk aktifasi akun</a>`;
+    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
     await nodemailer.sendEmail(email, 'Account Activation OTP', html);
 
     return res.status(201).json({
@@ -276,25 +285,26 @@ const createAdmin = async (req, res, next) => {
   }
 };
 
-const verifyOTP = async (req, res) => {
+const verifyOTP = async (req, res, next) => {
   try {
-    const { email, otp } = req.body;
+    const { token, otp } = req.query;
 
-    const { value, error } = await verifyOTPSchema.validateAsync({
-      email,
-      otp,
+    await verifyOTPSchema.validateAsync({
+      ...req.query,
     });
 
-    if (error) {
+    const decode = jwt.decode(token, process.env.JWT_SECRET);
+
+    if (!decode) {
       return res.status(400).json({
         status: false,
-        message: 'Bad Request',
-        err: error.message,
+        message: 'Bad request',
+        err: 'Invalid token',
         data: null,
       });
     }
 
-    const user = await prisma.users.findUnique({ where: { email } });
+    const user = await prisma.users.findUnique({ where: { email: decode.email } });
 
     if (!user) {
       return res.status(404).json({
@@ -305,7 +315,7 @@ const verifyOTP = async (req, res) => {
       });
     }
 
-    const storedOTP = await otpHandler.getOTPFromStorage(email);
+    const storedOTP = await otpHandler.getOTPFromStorage(decode.email);
 
     if (otp !== storedOTP) {
       return res.status(400).json({
@@ -318,7 +328,7 @@ const verifyOTP = async (req, res) => {
 
     // OTP yang sesuai, tandai verifikasi pengguna di sini jika perlu
     await prisma.users.update({
-      where: { email },
+      where: { email: decode.email },
       data: { isVerified: true, otp: null },
     });
 
@@ -508,6 +518,57 @@ const changePassword = async (req, res, next) => {
   }
 };
 
+const resendOTP = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+
+    await forgotPasswordSchema.validateAsync({ ...req.body });
+
+    const user = await prisma.users.findUnique({ where: { email } });
+
+    if (!user) {
+      return res.status(404).json({
+        status: false,
+        message: 'User not found',
+        err: null,
+        data: null,
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        status: false,
+        message: 'User already verified',
+        err: null,
+        data: null,
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: '7d',
+      }
+    );
+
+    const otp = await otpHandler.generateOTP(email);
+    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
+    await nodemailer.sendEmail(email, 'Account Activation OTP', html);
+
+    return res.json({
+      status: true,
+      message: 'OTP sent to email successfully',
+      err: null,
+      data: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   loginUser,
   loginAdmin,
@@ -518,4 +579,5 @@ module.exports = {
   forgotPassword,
   resetPassword,
   changePassword,
+  resendOTP,
 };
