@@ -141,13 +141,7 @@ const getProfile = async (req, res, next) => {
       data: profile,
     });
   } catch (error) {
-    next();
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to get user profile',
-      err: err.message,
-      data: null,
-    });
+    next(error);
   }
 };
 

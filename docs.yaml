@@ -394,6 +394,38 @@ paths:
       security:
         - bearerAuth: []
 
+  /auth/google:
+    get:
+      tags:
+        - Users
+      operationId: get-google-auth
+      summary: Google Auth
+      description: Google Auth
+      responses:
+        '200':
+          description: Google Auth success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+  
+  /auth/google/callback:
+    get:
+      tags:
+        - Users
+      operationId: get-google-auth-callback
+      summary: Google Auth Callback
+      description: Google Auth Callback
+      responses:
+        '200':
+          description: Google Auth Callback success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
   /activeUsers:
     get:
       tags:

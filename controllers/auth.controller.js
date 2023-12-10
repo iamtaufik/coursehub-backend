@@ -43,6 +43,13 @@ const loginUser = async (req, res, next) => {
       });
     }
 
+    if(user.googleId){
+      return res.status(400).json({
+        success: false,
+        message: 'Use google login',
+      })
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -234,13 +241,32 @@ const loginAdmin = async (req, res, next) => {
   }
 };
 
-const authenticate = (req, res, next) => {
-  return res.status(200).json({
-    status: true,
-    message: 'OK',
-    err: null,
-    data: { user: req.user },
-  });
+const authenticate = async (req, res, next) => {
+  try {
+    const { user } = req;
+
+    delete user.password;
+    console.log(user);
+    const userDetail = await prisma.users.findUnique({
+      where: {
+        email: user.email,
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    delete userDetail.password;
+
+    return res.status(200).json({
+      status: true,
+      message: 'OK',
+      err: null,
+      data: { ...userDetail },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 const createAdmin = async (req, res, next) => {
@@ -569,6 +595,21 @@ const resendOTP = async (req, res, next) => {
   }
 };
 
+const loginGoogle = async (req, res, next) => {
+  try {
+    let token = jwt.sign({ id: req.user.id, nickname: req.user.nickname, email: req.user.email }, process.env.JWT_SECRET);
+
+    return res.status(200).json({
+      success: true,
+      message: 'OK',
+      err: null,
+      data: { ...req.user, token },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   loginUser,
   loginAdmin,
@@ -580,4 +621,5 @@ module.exports = {
   resetPassword,
   changePassword,
   resendOTP,
+  loginGoogle,
 };
