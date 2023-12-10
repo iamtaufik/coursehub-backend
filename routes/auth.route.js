@@ -1,7 +1,8 @@
 const router = require('express').Router();
-const { loginAdmin, register, loginUser, verifyOTP, authenticate, resendOTP, createAdmin, forgotPassword, resetPassword, changePassword } = require('../controllers/auth.controller');
+const { loginAdmin, register, loginUser, verifyOTP,loginGoogle, authenticate, resendOTP, createAdmin, forgotPassword, resetPassword, changePassword } = require('../controllers/auth.controller');
 const verifyToken = require('../middlewares/verifyToken');
 const verifyAdmin = require('../middlewares/verifyAdmin');
+const passport = require('../libs/passport');
 
 router.get('/', (req, res) => {
   res.send('Hello World! this is development branch');
@@ -18,4 +19,9 @@ router.post('/reset-password', resetPassword);
 router.get('/admin/whoami', verifyToken, verifyAdmin, authenticate);
 router.put('/change-password', verifyToken, changePassword);
 router.post('/resend-otp', resendOTP);
+
+// Google OAuth
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google/callback', passport.authenticate('google', {session:false, failureRedirect: '/api/v1/auth/google/failure' }), loginGoogle);
+
 module.exports = router;
