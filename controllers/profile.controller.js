@@ -19,7 +19,7 @@ function toIndonesianPhoneNumber(phoneNumber) {
 
 const updateProfile = async (req, res, next) => {
   const id = req.user.id;
-  const { phone_number, first_name, last_name, city, country } = req.body;
+  const { phone_number, full_name, city, country } = req.body;
   const file = req.file;
   try {
     await createProfileSchema.validateAsync({ ...req.body });
@@ -60,8 +60,7 @@ const updateProfile = async (req, res, next) => {
         },
         data: {
           phone_number: indonesianPhoneNumber,
-          first_name,
-          last_name,
+          full_name,
           profile_picture: url,
           city,
           country,
