@@ -81,8 +81,7 @@ const updateProfile = async (req, res, next) => {
       },
       data: {
         phone_number: indonesianPhoneNumber,
-        first_name,
-        last_name,
+        full_name,
         profile_picture: req.body.profile_picture,
         city,
         country,
