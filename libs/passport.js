@@ -23,8 +23,7 @@ passport.use(
             isVerified: profile.emails[0].verified,
             profile: {
               create: {
-                first_name: profile.name.givenName,
-                last_name: profile.name.familyName,
+                full_name: profile.displayName,
                 profile_picture: profile.photos[0].value,
               },
             },

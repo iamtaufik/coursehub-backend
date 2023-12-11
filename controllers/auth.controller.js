@@ -144,8 +144,7 @@ const register = async (req, res, next) => {
     await prisma.profiles.create({
       data: {
         users_id: user_id,
-        first_name: null,
-        last_name: null,
+        full_name: null,
         phone_number: phone_number,
         profile_picture: null,
         city: null,
