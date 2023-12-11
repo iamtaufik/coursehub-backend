@@ -409,7 +409,7 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/BasicResponse'
-  
+
   /auth/google/callback:
     get:
       tags:
@@ -1638,12 +1638,9 @@ components:
               phone_number:
                 type: string
                 example: '62829932992'
-              first_name:
+              full_name:
                 type: string
-                example: 'User'
-              last_name:
-                type: string
-                example: 'Test'
+                example: 'Muhammad Taufik Hidayat 21.11.4316'
               profile_image:
                 type: string
                 example: 'Upload File Image'
