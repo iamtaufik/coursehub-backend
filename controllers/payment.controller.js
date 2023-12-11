@@ -25,7 +25,7 @@ const checkout = async (req, res, next) => {
     await createPaymentSchema.validateAsync({ ...req.body, nickname, email, phone_number, id });
 
     const course = await prisma.courses.findUnique({
-      where: { id: courseId, AND: { isDeleted: false } },
+      where: { id: Number(courseId), AND: { isDeleted: false } },
     });
 
     if (!course) {
