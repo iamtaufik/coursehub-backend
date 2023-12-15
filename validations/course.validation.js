@@ -3,8 +3,9 @@ const joi = require('joi');
 const createCourseSchema = joi.object({
   title: joi.string().required(),
   description: joi.string().required(),
-  image: joi.string(),
+  telegram_group: joi.string().optional(),
   price: joi.number().required(),
+  ratings: joi.number().default(0),
   category_id: joi.number().required(),
   requirements: joi.array().items(joi.string()).required(),
   level: joi.string().valid('beginner', 'intermediate', 'advanced').required(),
@@ -53,6 +54,7 @@ const joinCourseSchema = joi.object({
 const updateCourseSchema = joi.object({
   title: joi.string().required(),
   description: joi.string().required(),
+  telegram_group: joi.string(),
   image: joi.string(),
   price: joi.number().required(),
   category_id: joi.number().required(),

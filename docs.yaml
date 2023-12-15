@@ -688,13 +688,13 @@ paths:
       security:
         - bearerAuth: []
 
-  '/courses/me':
+  /courses/me:
     get:
       tags:
         - Course
       operationId: get-users-join-course
-      summary: Get Detail Users join course
-      description: Get Detail Users Join Course
+      summary: Get All Courses Users join
+      description: Get All Courses Users join
       responses:
         '200':
           description: Courses retrieved successfully!
@@ -704,6 +704,58 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/BasicResponse'
                   - type: object
+
+      security:
+        - bearerAuth: []
+
+  /courses/me/{id}:
+    get:
+      tags:
+        - Course
+      operationId: get-detail-users-join-course
+      summary: Get Detail Course Users join
+      description: Get Detail Course Users join
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /courses/me/progress/{progressId}:
+    put:
+      tags:
+        - Course
+      operationId: put-update-users-progres-course
+      summary: Update Users progress course
+      description: Update Data Users Progress Course
+      parameters:
+        - in: path
+          name: progressId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Progress to retrieve.
+      responses:
+        '200':
+          description: Update course successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
 
       security:
         - bearerAuth: []
@@ -1501,9 +1553,81 @@ components:
 
     createCourse:
       content:
+        # multipart/form-data:
+        #   schema:
+        #     type: object
+
+        #     properties:
+        #       title:
+        #         type: string
+        #         example: 'course beginner 1'
+        #       description:
+        #         type: string
+        #         example: 'Description beginner 1'
+        #       telegram_group:
+        #         type: string
+        #         example: 'https://t.me/joinchat/1'
+        #       price:
+        #         type: integer
+        #         example: 150000
+        #       image:
+        #         type: string
+        #         example: 'Upload File Image'
+        #         format: binary
+        #       level:
+        #         type: string
+        #         example: 'beginner'
+        #       author:
+        #         type: string
+        #         example: 'CourseHub'
+        #       category_id:
+        #         type: integer
+        #         example: 1
+        #       requirements:
+        #         type: array
+        #         items:
+        #           type: string
+        #         example:
+        #           - 'React JS'
+        #           - 'Tailwind css'
+        #           - 'Node JS'
+        #       chapters:
+        #         type: array
+        #         items:
+        #           type: object
+        #           properties:
+        #             name:
+        #               type: string
+        #               example: 'Chapter 1'
+        #             modules:
+        #               type: array
+        #               items:
+        #                 type: object
+        #                 properties:
+        #                   title:
+        #                     type: string
+        #                     example: 'Module 1'
+        #                   duration:
+        #                     type: integer
+        #                     example: 60
+        #                   url:
+        #                     type: string
+        #                     format: uri
+        #                     example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+
         application/json:
           schema:
             type: object
+            required:
+              - title
+              - description
+              - price
+              - author
+              - level
+              - category_id
+              - requirements
+              - chapters
+
             properties:
               title:
                 type: string
@@ -1511,9 +1635,9 @@ components:
               description:
                 type: string
                 example: 'Description beginner 1'
-              image:
+              telegram_group:
                 type: string
-                example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+                example: 'https://t.me/joinchat/1'
               price:
                 type: integer
                 example: 150000
