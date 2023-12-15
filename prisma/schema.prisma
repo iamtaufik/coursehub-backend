@@ -98,6 +98,7 @@ model Modules {
   duration   Int
   url        String
   chapter_id Int
+  isTrailer  Boolean  @default(false)
   chapters   Chapters @relation(fields: [chapter_id], references: [id])
   userCourseProgress UserCourseProgress[]
   createdAt  DateTime @default(now())
