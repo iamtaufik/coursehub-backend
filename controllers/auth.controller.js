@@ -43,11 +43,11 @@ const loginUser = async (req, res, next) => {
       });
     }
 
-    if(user.googleId){
+    if (user.googleId) {
       return res.status(400).json({
         success: false,
         message: 'Use google login',
-      })
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -245,15 +245,24 @@ const authenticate = async (req, res, next) => {
     const { user } = req;
 
     delete user.password;
-    console.log(user);
-    const userDetail = await prisma.users.findUnique({
-      where: {
-        email: user.email,
-      },
-      include: {
-        profile: true,
-      },
-    });
+    let userDetail = null;
+
+    if (user.idAdmin) {
+      userDetail = await prisma.admin.findUnique({
+        where: {
+          idAdmin: user.idAdmin,
+        },
+      });
+    } else {
+      userDetail = await prisma.users.findUnique({
+        where: {
+          email: user.email,
+        },
+        include: {
+          profile: true,
+        },
+      });
+    }
 
     delete userDetail.password;
 
