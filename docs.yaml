@@ -36,6 +36,8 @@ tags:
     description: Operations related to Transaction
   - name: Notification
     description: Operations related to Notification
+  - name: Cron Job
+    description: Operations related to Cron Job
 paths:
   /auth/register:
     post:
@@ -1186,6 +1188,23 @@ paths:
 
       security:
         - bearerAuth: []
+
+  /cron:
+    get:
+      tags:
+        - Cron Job
+      operationId: get-cron-job
+      summary: Cron Job
+      description: This endpoint will be automatically executed every 3 day at 00:00 WIB, you should can't call this endpoint manually.
+      responses:
+        '200':
+          description: This endpoint will be automatically executed every 3 day at 00:00 WIB, you should can't call this endpoint manually.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
 components:
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme
