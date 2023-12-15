@@ -7,18 +7,9 @@ const verifySecretCron = async (req, res, next) => {
         data: null,
       });
 
-    const secret = req.headers.authorization.split(' ')[1];
+    const authHeader = req.headers.authorization;
 
-    if (!secret) {
-      return res.status(401).json({
-        success: false,
-        message: 'Unauthorized',
-        err: 'No secret cron provided',
-        data: null,
-      });
-    }
-
-    if (secret !== process.env.CRON_SECRET) {
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return res.status(401).json({
         status: false,
         message: 'Unauthorized',
