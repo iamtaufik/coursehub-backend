@@ -52,6 +52,7 @@ const createCourse = async (req, res, next) => {
                     title: module.title,
                     duration: module.duration,
                     url: module.url,
+                    isTrailer: module.isTrailer,yield
                   };
                 }),
               },

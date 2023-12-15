@@ -30,6 +30,7 @@ const createCourseSchema = joi.object({
               title: joi.string().required(),
               duration: joi.number().required(),
               url: joi.string().required(),
+              isTrailer: joi.boolean().default(false),
             })
           )
           .required(),
