@@ -68,6 +68,7 @@ model Courses {
   title              String
   description        String
   image              String?
+  telegram_group     String?
   requirements       String[]
   level              Levels               @default(beginner)
   price              Int

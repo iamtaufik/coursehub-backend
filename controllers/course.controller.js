@@ -1,29 +1,49 @@
 const prisma = require('../libs/prisma');
+const path = require('path');
+const imagekit = require('../libs/imagekit');
 const { createCourseSchema, updateCourseSchema, getCourseSchema, joinCourseSchema } = require('../validations/course.validation');
 const { getPagination } = require('../libs/getPaggination');
 
 const createCourse = async (req, res, next) => {
-  const { title, description, price, image, chapters, requirements, author, level } = req.body;
   try {
-    await createCourseSchema.validateAsync({ ...req.body });
+    const { value, error } = createCourseSchema.validate({ ...req.body });
+
+    if (error) {
+      return res.status(400).json({
+        status: false,
+        message: 'ValidationError',
+        data: error.details[0].message,
+      });
+    }
+
+    let image = null;
+    if (req.file) {
+      const strFile = req.file.buffer.toString('base64');
+      const { url } = await imagekit.upload({
+        fileName: Date.now() + path.extname(req.file.originalname),
+        file: strFile,
+      });
+      image = url;
+    }
 
     const course = await prisma.courses.create({
       data: {
-        title,
-        description,
+        title: value.title,
+        telegram_group: value.telegram_group,
+        description: value.description,
         image,
-        price,
-        author,
-        level,
-        ratings: 0,
-        requirements: { set: requirements },
+        price: value.price,
+        author: value.author,
+        level: value.level,
+        ratings: value.ratings,
+        requirements: { set: value.requirements },
         category: {
           connect: {
-            id: req.body.category_id,
+            id: value.category_id,
           },
         },
         chapters: {
-          create: chapters.map((chapter) => {
+          create: value.chapters.map((chapter) => {
             return {
               name: chapter.name,
               modules: {
@@ -237,7 +257,7 @@ const updateCourse = async (req, res, next) => {
       });
     }
 
-    const { title, description, price, image, chapters, requirements, author, level } = req.body;
+    const { title, description, telegram_group, price, image, chapters, requirements, author, level } = req.body;
     const existingChapters = await prisma.chapters.findMany({
       where: {
         course_id: course_id,
@@ -258,6 +278,7 @@ const updateCourse = async (req, res, next) => {
       },
       data: {
         title,
+        telegram_group,
         description,
         image,
         price,
@@ -468,7 +489,17 @@ const joinCourse = async (req, res, next) => {
       prisma.userCourseProgress.createMany({
         data: temp.flat(),
       }),
+      prisma.notification.create({
+        data: {
+          title: 'Notifikasi',
+          notificationId: Math.floor(Math.random() * 1000000),
+          body: `Selamat anda berhasil mengikuti kelas ${course.title}`,
+          userId: user.id,
+        },
+      }),
     ]);
+
+    delete join.password;
 
     res.status(201).json({
       status: true,
@@ -484,7 +515,7 @@ const myCourse = async (req, res, next) => {
   try {
     const { email } = req.user;
 
-    const { courses } = await prisma.users.findUnique({
+    let { courses } = await prisma.users.findUnique({
       where: {
         email,
       },
@@ -527,12 +558,15 @@ const getDetailMyCourse = async (req, res, next) => {
       });
     }
 
-    const checkJoin = await prisma.users.findFirst({
+    const checkJoin = await prisma.users.findUnique({
       where: {
         email,
         courses: {
           some: {
             id: Number(id),
+            AND: {
+              isDeleted: false,
+            },
           },
         },
       },
@@ -546,7 +580,7 @@ const getDetailMyCourse = async (req, res, next) => {
       });
     }
 
-    const myDetailCourse = await prisma.users.findFirst({
+    let { courses } = await prisma.users.findFirst({
       where: {
         email,
       },
@@ -554,20 +588,11 @@ const getDetailMyCourse = async (req, res, next) => {
         courses: {
           where: {
             id: Number(id),
-            AND: {
-              isDeleted: false,
-            },
+            isDeleted: false,
           },
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            author: true,
-            requirements: true,
+          include: {
             chapters: {
-              select: {
-                id: true,
-                name: true,
+              include: {
                 modules: {
                   select: {
                     id: true,
@@ -579,6 +604,7 @@ const getDetailMyCourse = async (req, res, next) => {
                         userId: { equals: Number(req.user.id) },
                       },
                       select: {
+                        id: true,
                         isCompleted: true,
                       },
                     },
@@ -591,10 +617,62 @@ const getDetailMyCourse = async (req, res, next) => {
       },
     });
 
+    courses = courses.map((course) => ({
+      ...course,
+      chapters: course.chapters.map((chapter) => ({
+        ...chapter,
+        modules: chapter.modules.map((module) => ({
+          ...module,
+          userCourseProgress: module.userCourseProgress[0],
+        })),
+      })),
+    }));
+
     res.status(200).json({
       status: true,
       message: 'Detail Courses!',
-      data: { ...myDetailCourse.courses[0] },
+      data: { ...courses[0] },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const myCourseProgress = async (req, res, next) => {
+  try {
+    const { id } = req.user;
+    const { progressId } = req.params;
+
+    const isExsitUserProgress = await prisma.userCourseProgress.findFirst({
+      where: {
+        id: Number(progressId),
+        AND: {
+          userId: Number(id),
+        },
+      },
+    });
+
+    if (!isExsitUserProgress) {
+      return res.status(400).json({
+        success: false,
+        message: 'You are not owner this progress',
+        data: null,
+      });
+    }
+
+    const isCompletedUserProgress = await prisma.userCourseProgress.update({
+      where: {
+        id: Number(progressId),
+      },
+      data: {
+        isCompleted: true,
+      },
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Success',
+      data: isCompletedUserProgress,
     });
   } catch (error) {
     next(error);
@@ -610,4 +688,5 @@ module.exports = {
   updateCourse,
   deleteCourse,
   getDetailMyCourse,
+  myCourseProgress,
 };

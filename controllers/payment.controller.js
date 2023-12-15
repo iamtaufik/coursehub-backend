@@ -121,6 +121,9 @@ const notification = async (req, res, next) => {
       where: {
         orderId: Number(order_id),
       },
+      include: {
+        course: true,
+      },
     });
 
     if (transaction) {
@@ -136,19 +139,29 @@ const notification = async (req, res, next) => {
           },
         });
 
-        // set course to user
-        await prisma.users.update({
-          where: {
-            id: transaction.userId,
-          },
-          data: {
-            courses: {
-              connect: {
-                id: transaction.courseId,
+        await prisma.$transaction([
+          // set course to user
+          prisma.users.update({
+            where: {
+              id: transaction.userId,
+            },
+            data: {
+              courses: {
+                connect: {
+                  id: transaction.courseId,
+                },
               },
             },
-          },
-        });
+          }),
+          prisma.notification.create({
+            data: {
+              title: 'Notifikasi',
+              notificationId: Math.floor(Math.random() * 1000000),
+              body: `Selamat anda berhasil mengikuti kelas ${transaction.course.title}`,
+              userId: user.id,
+            },
+          }),
+        ]);
       } else if (transaction_status === 'cancel') {
         await prisma.transactions.update({
           where: {
