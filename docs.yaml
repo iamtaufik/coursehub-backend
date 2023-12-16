@@ -397,31 +397,26 @@ paths:
         - bearerAuth: []
 
   /auth/google:
-    get:
+    post:
       tags:
         - Users
-      operationId: get-google-auth
+      operationId: post-google-auth
       summary: Google Auth
       description: Google Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - idToken
+              properties:
+                access_token:
+                  type: string
+                  example: 'access_token'
       responses:
         '200':
           description: Google Auth success!.
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/BasicResponse'
-
-  /auth/google/callback:
-    get:
-      tags:
-        - Users
-      operationId: get-google-auth-callback
-      summary: Google Auth Callback
-      description: Google Auth Callback
-      responses:
-        '200':
-          description: Google Auth Callback success!.
           content:
             application/json:
               schema:
