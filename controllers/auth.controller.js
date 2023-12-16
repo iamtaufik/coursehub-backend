@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const otpHandler = require('../libs/otpHandler');
 const nodemailer = require('../libs/nodemailer');
 const { registerUserSchema, createAdminSchema, forgotPasswordSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema, resetPasswordSchema, changePasswordSchema } = require('../validations/auth.validation');
-
+const axios = require('axios');
 // login user
 const loginUser = async (req, res, next) => {
   try {
@@ -605,13 +605,60 @@ const resendOTP = async (req, res, next) => {
 
 const loginGoogle = async (req, res, next) => {
   try {
-    let token = jwt.sign({ id: req.user.id, nickname: req.user.nickname, email: req.user.email }, process.env.JWT_SECRET);
+    const { access_token } = req.body;
+
+    if (!access_token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bad Request',
+        err: 'Access token required',
+        data: null,
+      });
+    }
+
+    const response = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${access_token}`);
+
+    const { email, name, picture } = response.data;
+
+    let user = await prisma.users.findUnique({
+      where: {
+        email: email,
+      },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!user) {
+      user = await prisma.users.upsert({
+        where: {
+          email: email,
+        },
+        update: { googleId: response.data.sub, profile: { update: { profile_picture: picture } } },
+        create: {
+          nickname: name,
+          email: email,
+          googleId: response.data.sub,
+          isVerified: true,
+          profile: {
+            create: {
+              full_name: name,
+              profile_picture: picture,
+            },
+          },
+        },
+      });
+    }
+
+    delete user.password;
+
+    let token = jwt.sign({ id: user.id, nickname: user.nickname, email: user.email }, process.env.JWT_SECRET);
 
     return res.status(200).json({
       success: true,
       message: 'OK',
       err: null,
-      data: { ...req.user, token },
+      data: { ...user, token },
     });
   } catch (error) {
     next(error);
