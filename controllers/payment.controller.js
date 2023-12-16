@@ -161,7 +161,7 @@ const notification = async (req, res, next) => {
               title: 'Notifikasi',
               notificationId: Math.floor(Math.random() * 1000000),
               body: `Selamat anda berhasil mengikuti kelas ${transaction.course.title}`,
-              userId: user.id,
+              userId: transaction.userId,
             },
           }),
         ]);
