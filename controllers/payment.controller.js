@@ -137,6 +137,9 @@ const notification = async (req, res, next) => {
             payment_type: payment_type,
             transaction_time: new Date(transaction_time),
           },
+          include: {
+            course: true,
+          },
         });
 
         await prisma.$transaction([
