@@ -203,6 +203,11 @@ Content-Type: application/json
 GET http://localhost:3000/api/v1/premiumClass/
 Content-Type: application/json
 
+#### getRatings
+GET http://localhost:3000/api/v1/ratings/1
+Content-Type: application/json
+
+
 
 #### create promo
 POST http://localhost:3000/api/v1/promo/

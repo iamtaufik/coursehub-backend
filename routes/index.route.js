@@ -10,5 +10,6 @@ router.use('/', require('./dashboard.route'));
 router.use('/promo', require('./promo.route'));
 router.use('/notification', require('./notification.route'));
 router.use(require('./reminder.route'));
+router.use('/ratings', require('./ratings.route'));
 
 module.exports = router;

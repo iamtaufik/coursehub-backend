@@ -38,6 +38,8 @@ tags:
     description: Operations related to Notification
   - name: Cron Job
     description: Operations related to Cron Job
+  - name: Ratings
+    description: Operations related to Ratings
 paths:
   /auth/register:
     post:
@@ -1199,6 +1201,55 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/BasicResponse'
+                  
+                  
+  /ratings:
+    post:
+      tags:
+        - Ratings
+      operationId: get-post-ratings
+      summary: Users Create Rating Course
+      description: Create data rating.
+      requestBody:
+        $ref: '#/components/requestBodies/createRatings'
+      responses:
+        '201':
+          description: Rating created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    
+      security:
+        - bearerAuth: []
+        
+  '/ratings/{id}':
+    get:
+      tags:
+        - Ratings
+      operationId: get-ratings
+      summary: Get Data Rating Course
+      description: Get data rating course.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      responses:
+        '200':
+          description: Rating retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+        
 
 components:
   securitySchemes:
@@ -1554,6 +1605,20 @@ components:
               confirm_password:
                 type: string
                 example: '*********'
+                
+                
+    createRatings:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: integer
+                example: 1
+              ratings:
+                type: integer
+                example: 5
 
     createToken:
       content:
