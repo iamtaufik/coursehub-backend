@@ -1241,7 +1241,7 @@ paths:
           description: The ID of the Course to retrieve.
       responses:
         '200':
-          description: Promo retrieved successfully!
+          description: Rating retrieved successfully!
           content:
             application/json:
               schema:
