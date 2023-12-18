@@ -35,7 +35,6 @@ const createCourse = async (req, res, next) => {
         price: value.price,
         author: value.author,
         level: value.level,
-        ratings: value.ratings,
         requirements: { set: value.requirements },
         category: {
           connect: {
