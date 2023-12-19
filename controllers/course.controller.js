@@ -77,12 +77,14 @@ const createCourse = async (req, res, next) => {
   }
 };
 
+
 const getCourses = async (req, res, next) => {
   try {
+    let courses;
+
     if (req.query.search) {
       const { search } = req.query;
-
-      const courses = await prisma.courses.findMany({
+      courses = await prisma.courses.findMany({
         where: {
           title: {
             contains: search,
@@ -92,19 +94,12 @@ const getCourses = async (req, res, next) => {
         },
         include: {
           category: true,
+          ratings: true,
         },
       });
-
-      return res.status(200).json({
-        status: true,
-        message: 'Courses retrieved successfully',
-        data: courses,
-      });
-    }
-
-    if (req.query.category) {
+    } else if (req.query.category) {
       const { category } = req.query;
-      const courses = await prisma.courses.findMany({
+      courses = await prisma.courses.findMany({
         where: {
           category: {
             name_categories: typeof category === 'string' ? { in: [category] } : { in: [...category] },
@@ -113,19 +108,12 @@ const getCourses = async (req, res, next) => {
         },
         include: {
           category: true,
+          ratings: true,
         },
       });
-
-      return res.status(200).json({
-        status: true,
-        message: 'Courses retrieved successfully',
-        data: courses,
-      });
-    }
-
-    if (req.query.level) {
+    } else if (req.query.level) {
       const { level } = req.query;
-      const courses = await prisma.courses.findMany({
+      courses = await prisma.courses.findMany({
         where: {
           level: {
             in: [level],
@@ -134,48 +122,32 @@ const getCourses = async (req, res, next) => {
         },
         include: {
           category: true,
+          ratings: true,
         },
       });
-
-      return res.json({
-        status: true,
-        message: 'Courses retrieved successfully',
-        data: courses,
-      });
-    }
-
-    if (req.query.filter) {
+    } else if (req.query.filter) {
       const { filter } = req.query;
       const filterOptions = {
         populer: { orderBy: { ratings: 'desc' } },
         terbaru: { orderBy: { createdAt: 'desc' } },
       };
-
-      const courses = await prisma.courses.findMany({
+      courses = await prisma.courses.findMany({
         ...filterOptions[filter],
         where: {
           isDeleted: false,
         },
         include: {
           category: true,
+          ratings: true,
         },
       });
-      return res.json({
-        status: true,
-        message: 'Courses retrieved successfully',
-        data: courses,
-      });
-    }
-
-    if (req.query.level && req.category && req.query.filter) {
+    } else if (req.query.level && req.category && req.query.filter) {
       const { level, category, fillter } = req.query;
-
       const filterOptions = {
         populer: { orderBy: { ratings: 'desc' } },
         terbaru: { orderBy: { createdAt: 'desc' } },
       };
-
-      const courses = await prisma.courses.findMany({
+      courses = await prisma.courses.findMany({
         ...filterOptions[fillter],
         where: {
           category: {
@@ -185,33 +157,24 @@ const getCourses = async (req, res, next) => {
         },
         include: {
           category: true,
+          ratings: true,
         },
       });
-
-      return res.status(200).json({
-        status: true,
-        message: 'Courses retrieved successfully',
-        data: courses,
-      });
-    }
-    if (req.query.page && req.query.limit) {
+    } else if (req.query.page && req.query.limit) {
       const { page = 1, limit = 10 } = req.query;
-
-      const courses = await prisma.courses.findMany({
+      courses = await prisma.courses.findMany({
         where: { isDeleted: false },
         skip: (Number(page) - 1) * Number(limit),
         take: Number(limit),
         include: {
           category: true,
+          ratings: true,
         },
       });
-
       const { _count } = await prisma.courses.aggregate({
         _count: { id: true },
       });
-
       const pagination = getPagination(req, _count.id, Number(page), Number(limit));
-
       return res.status(200).json({
         status: true,
         message: 'Courses retrieved successfully',
@@ -220,11 +183,30 @@ const getCourses = async (req, res, next) => {
           pagination,
         },
       });
+    } else {
+      courses = await prisma.courses.findMany({
+        where: { isDeleted: false },
+        include: {
+          category: true,
+          ratings: true,
+        },
+      });
     }
 
-    const courses = await prisma.courses.findMany({
-      where: { isDeleted: false },
-    });
+    const calculateAverageRating = (ratings) => {
+      if (ratings && ratings.length > 0) {
+        const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
+        const totalUsers = ratings.length;
+        return totalRatings / totalUsers;
+      } else {
+        return 0;
+      }
+    };
+
+    courses = courses.map((course) => ({
+      ...course,
+      averageRating: calculateAverageRating(course.ratings),
+    }));
 
     return res.status(200).json({
       status: true,
@@ -235,6 +217,7 @@ const getCourses = async (req, res, next) => {
     next(error);
   }
 };
+
 const updateCourse = async (req, res, next) => {
   try {
     const course_id = parseInt(req.params.id);
@@ -371,6 +354,7 @@ const getDetailCourses = async (req, res, next) => {
             modules: true,
           },
         },
+        ratings: true,
       },
     });
 
@@ -382,6 +366,23 @@ const getDetailCourses = async (req, res, next) => {
       });
     }
 
+    const calculateAverageRating = (ratings) => {
+      if (ratings && ratings.length > 0) {
+        const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
+        const totalUsers = ratings.length;
+        return totalRatings / totalUsers;
+      } else {
+        return 0;
+      }
+    };
+
+    const averageRating = calculateAverageRating(course.ratings);
+
+    course = {
+      ...course,
+      averageRating: averageRating,
+    };
+
     res.status(200).json({
       status: true,
       message: 'Detail Courses!',
@@ -391,6 +392,7 @@ const getDetailCourses = async (req, res, next) => {
     next(error);
   }
 };
+
 
 const joinCourse = async (req, res, next) => {
   try {
