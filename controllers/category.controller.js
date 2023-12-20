@@ -17,19 +17,23 @@ const getCategories = async (req, res, next) => {
 
 const getCourseByCategory = async (req, res, next) => {
   try {
-    await getCategoriesSchema.validateAsync({...req.params});
+    await getCategoriesSchema.validateAsync({ ...req.params });
     const id = parseInt(req.params.id);
 
     const category = await prisma.categories.findUnique({
       where: { id: Number(id) },
       include: {
-        courses: true,
+        courses: {
+          where: {
+            isDeleted: false,
+          },
+        },
       },
     });
 
     if (!category) {
       return res.status(404).json({
-        message: 'Course category not found!'
+        message: 'Course category not found!',
       });
     }
 
