@@ -31,7 +31,7 @@ const sendEmail = async (to, subject, html) => {
             }
         });
 
-        await transport.sendMail({ to, subject, html });
+        transport.sendMail({ to, subject, html });
         console.log('Email sent successfully');
     } catch (error) {
         console.error('Error sending email:', error);
