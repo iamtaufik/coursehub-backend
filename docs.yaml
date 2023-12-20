@@ -1,0 +1,1858 @@
+openapi: 3.0.0
+info:
+  title: Docs API Backend Coursehub
+  description: |-
+    Backend sistem API CourseHub untuk website MOOC adalah bagian integral dari struktur teknologi yang mendukung fungsi aplikasi atau situs web MOOC. Fungsinya adalah mengelola dan menyediakan data terkait kursus, pengguna, materi pelajaran, dan informasi relevan lainnya kepada pengguna. API backend CourseHub memberikan akses kepada pengembang untuk mengambil dan menyinkronkan informasi terkini secara otomatis.
+
+    API backend ini mencakup berbagai endpoint atau titik akses yang memfasilitasi penggunaan data seperti detail kursus, informasi pengguna, materi pelajaran, kemajuan pengguna, dan fitur terkait lainnya. Penggunaan API melibatkan operasi seperti pencarian kursus, pemfilteran data, dan pengambilan informasi untuk integrasi dengan antarmuka pengguna pada aplikasi MOOC.
+
+    Dengan memanfaatkan API backend CourseHub, pengembang dapat mengintegrasikan fungsionalitas sistem dengan aplikasi eksternal atau mengembangkan aplikasi khusus yang menampilkan dan memanfaatkan data kursus secara efisien. Ini membantu dalam menyebarkan informasi tentang kursus secara luas dan meningkatkan pengalaman pengguna pada platform MOOC.
+  version: 1.0.0
+  contact:
+    name: CourseHub
+    email: CourseHubreal@gmail.com
+servers:
+  - url: http://localhost:3000/api/v1
+  - url: https://coursehub-development.vercel.app/api/v1
+  - url: https://coursehub-production.vercel.app/api/v1
+tags:
+  - name: Users
+    description: Operations related to auth Users
+  - name: Profile
+    description: Operations related to auth Profile
+  - name: Admin
+    description: Operations related to auth Admin
+  - name: Count Dashboard Admin
+    description: Operations related to auth Count Dashboard Admin
+  - name: Course
+    description: Operations related to Course
+  - name: Category
+    description: Operations related to Category
+  - name: Promo
+    description: Operations related to Promo
+  - name: Payment
+    description: Operations related to Payment
+  - name: Transaction
+    description: Operations related to Transaction
+  - name: Notification
+    description: Operations related to Notification
+  - name: Cron Job
+    description: Operations related to Cron Job
+  - name: Ratings
+    description: Operations related to Ratings
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Users
+      operationId: post-create-register
+      summary: Register new users
+      description: Successful account registration, check the account activation otp code in your email
+      requestBody:
+        $ref: '#/components/requestBodies/createRegister'
+      responses:
+        '201':
+          description: Succesfull Register!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RegisterModel'
+
+  /auth/verifyOTP:
+    post:
+      tags:
+        - Users
+      operationId: post-verify-otp
+      summary: Verify OTP (OTP Aktivasi)
+      description: Verify otp after account registration
+      parameters:
+        - in: query
+          name: otp
+          schema:
+            type: string
+          required: true
+          description: Enter the otp code sent from the email, OTP code to activate the account.
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: Enter the token .
+      responses:
+        '201':
+          description: Account activated successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/VerifyOtpModel'
+
+  /auth/resend-otp:
+    post:
+      tags:
+        - Users
+      operationId: post-resend-otp
+      summary: Resend OTP (OTP Aktivasi)
+      description: Resend otp after account registration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  example: 'usertest01@gmail.com'
+      responses:
+        '201':
+          description: Account activated successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+  /auth/login:
+    post:
+      tags:
+        - Users
+      operationId: post-login-users
+      summary: Login Users
+      description: Users account login
+      requestBody:
+        $ref: '#/components/requestBodies/createLoginUsers'
+      responses:
+        '201':
+          description: Login success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginUserModel'
+
+  /auth/forgotPassword:
+    post:
+      tags:
+        - Users
+      operationId: post-forgotPassword
+      summary: Forgot Password
+      description: Forgot password success,Password reset link successfully sent to email.
+      requestBody:
+        $ref: '#/components/requestBodies/createForgotPassword'
+      responses:
+        '201':
+          description: Password reset link sent to email successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ForgotPasswordModel'
+
+  /auth/reset-password:
+    post:
+      tags:
+        - Users
+      operationId: post-reset-password
+      summary: Reset Password
+      description: Enter new password & confirm_password.
+      parameters:
+        - in: query
+          name: token
+          schema:
+            type: string
+          required: true
+          description: Enter the token sent from the email, Token to reset password.
+      requestBody:
+        $ref: '#/components/requestBodies/createResetPassword'
+      responses:
+        '201':
+          description: Password reset link sent to email successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ResetPasswordModel'
+
+  /auth/whoami:
+    get:
+      tags:
+        - Users
+      operationId: get-fetch-whoami
+      summary: Get Whoami
+      description: Retrieves details of a specific users.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/WhoamiModel'
+
+      security:
+        - bearerAuth: []
+
+  /auth/change-password:
+    put:
+      tags:
+        - Users
+      operationId: put-change-password
+      summary: Change Password
+      description: Update user password, input old password, new password, confirm new password.
+      requestBody:
+        $ref: '#/components/requestBodies/createChangePassword'
+      responses:
+        '200':
+          description: Password updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChangePasswordModel'
+
+      security:
+        - bearerAuth: []
+
+  /profile:
+    get:
+      tags:
+        - Profile
+      operationId: get-detail-profile
+      summary: Get Detail Profile
+      description: Retrieves a list of detail profile.
+      responses:
+        '200':
+          description: Promo retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+      security:
+        - bearerAuth: []
+
+    put:
+      tags:
+        - Profile
+      operationId: put-update-profile
+      summary: Update Profile Details
+      description: Updates details of a specific profile.
+      requestBody:
+        $ref: '#/components/requestBodies/updateProfile'
+      responses:
+        '200':
+          description: Profile updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+      security:
+        - bearerAuth: []
+
+  /profile/:
+    put:
+      tags:
+        - Profile
+      operationId: put-update-profile-image
+      summary: Update Profile Image
+      description: Updates Profile Image.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                profile_image:
+                  type: string
+                  example: 'Upload File Image'
+      responses:
+        '200':
+          description: Profile updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+      security:
+        - bearerAuth: []
+
+  /auth/admin/register:
+    post:
+      tags:
+        - Admin
+      operationId: post-create-admin
+      summary: Register new Admin
+      description: Register new admin
+      requestBody:
+        $ref: '#/components/requestBodies/createAdmin'
+      responses:
+        '201':
+          description: Succesfull Create Admin!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AdminModel'
+
+  /auth/admin/login:
+    post:
+      tags:
+        - Admin
+      operationId: post-login-admin
+      summary: Login Admin
+      description: Admin account login
+      requestBody:
+        $ref: '#/components/requestBodies/createLoginAdmin'
+      responses:
+        '201':
+          description: Login success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LoginAdminModel'
+
+  /auth/admin/whoami:
+    get:
+      tags:
+        - Admin
+      operationId: get-fetch-whoami-admin
+      summary: Get Whoami Admin
+      description: Retrieves details of a specific admin.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/WhoamiModel'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: string
+                        example: Unauthorized
+      security:
+        - bearerAuth: []
+
+  /auth/google:
+    post:
+      tags:
+        - Users
+      operationId: post-google-auth
+      summary: Google Auth
+      description: Google Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - idToken
+              properties:
+                access_token:
+                  type: string
+                  example: 'access_token'
+      responses:
+        '200':
+          description: Google Auth success!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+  /activeUsers:
+    get:
+      tags:
+        - Count Dashboard Admin
+      operationId: get-fetch-all-active-users
+      summary: Get All Active Users
+      description: Retrieves details of a specific Active Users.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+      security:
+        - bearerAuth: []
+
+  /activeClass:
+    get:
+      tags:
+        - Count Dashboard Admin
+      operationId: get-fetch-all-active-class
+      summary: Get All Active Class
+      description: Retrieves details of a specific Active Class.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+      security:
+        - bearerAuth: []
+
+  /premiumClass:
+    get:
+      tags:
+        - Count Dashboard Admin
+      operationId: get-fetch-all-premium-class
+      summary: Get All Premium Class
+      description: Retrieves details of a specific Premium Class.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+      security:
+        - bearerAuth: []
+
+  /courses:
+    post:
+      tags:
+        - Course
+      operationId: post-courses
+      summary: Create New Course
+      description: Create Data Course
+      requestBody:
+        $ref: '#/components/requestBodies/createCourse'
+      responses:
+        '201':
+          description: Course created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CourseModel'
+
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - Course
+      operationId: get-fetch-all-course
+      summary: Get all Course
+      description: Retrieves a list of all registered course.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: Page number for pagination.
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          required: false
+          description: Number of items per page.
+        - in: query
+          name: search
+          schema:
+            type: string
+          required: false
+          description: Search by course title.
+        - in: query
+          name: sort
+          schema:
+            type: string
+          required: false
+          description: Sort course.
+        - in: query
+          name: level
+          schema:
+            type: string
+          required: false
+          description: Filter by level.
+        - in: query
+          name: category
+          schema:
+            type: string
+          required: false
+          description: Filter by category.
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          courses:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/CourseModel'
+                          pagination:
+                            $ref: '#/components/schemas/Pagination'
+
+  '/courses/{id}':
+    get:
+      tags:
+        - Course
+      operationId: get-detail-course
+      summary: Get Detail Course
+      description: Retrieves a list of detail courses.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CourseModel'
+
+    put:
+      tags:
+        - Course
+      operationId: put-update-course
+      summary: Update Course Details
+      description: Updates details of a specific course.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the course to update.
+      requestBody:
+        $ref: '#/components/requestBodies/updateCourse'
+      responses:
+        '200':
+          description: Course updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+      security:
+        - bearerAuth: []
+
+    delete:
+      tags:
+        - Course
+      operationId: delete-remove-course
+      summary: Delete Course
+      description: Deletes a specific course.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the course to delete.
+      responses:
+        '200':
+          description: Successful course deletion
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+
+      security:
+        - bearerAuth: []
+
+  /courses/{id}/join:
+    put:
+      tags:
+        - Course
+      operationId: post-users-join-course
+      summary: Create Users join course
+      description: Create Data Users Join Course
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      responses:
+        '201':
+          description: Join course successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+      security:
+        - bearerAuth: []
+
+  /courses/me:
+    get:
+      tags:
+        - Course
+      operationId: get-users-join-course
+      summary: Get All Courses Users join
+      description: Get All Courses Users join
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+      security:
+        - bearerAuth: []
+
+  /courses/me/{id}:
+    get:
+      tags:
+        - Course
+      operationId: get-detail-users-join-course
+      summary: Get Detail Course Users join
+      description: Get Detail Course Users join
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /courses/me/progress/{progressId}:
+    put:
+      tags:
+        - Course
+      operationId: put-update-users-progres-course
+      summary: Update Users progress course
+      description: Update Data Users Progress Course
+      parameters:
+        - in: path
+          name: progressId
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Progress to retrieve.
+      responses:
+        '200':
+          description: Update course successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /categories:
+    get:
+      tags:
+        - Category
+      operationId: get-fetch-all-category
+      summary: Get all Category
+      description: Retrieves a list of all registered category.
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+  /categories/{id}:
+    get:
+      tags:
+        - Category
+      operationId: get-all-courseByCategory
+      summary: Get Course by Category
+      description: Retrieves a list of all Course by Category.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course by Category to retrieve.
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/CourseModel'
+
+  /promo:
+    post:
+      tags:
+        - Promo
+      operationId: post-promo
+      summary: Create New Promo
+      description: Create Data Promo
+      requestBody:
+        $ref: '#/components/requestBodies/createPromo'
+      responses:
+        '201':
+          description: Promo created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PromoModel'
+
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - Promo
+      operationId: get-fetch-all-promo
+      summary: Get all Promo
+      description: Retrieves a list of all registered promo.
+      responses:
+        '200':
+          description: Promo retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          courses:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/PromoModel'
+
+      security:
+        - bearerAuth: []
+
+  '/promo/{id}':
+    get:
+      tags:
+        - Promo
+      operationId: get-detail-promo
+      summary: Get Detail Promo
+      description: Retrieves a list of detail promo.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Promo to retrieve.
+      responses:
+        '200':
+          description: Promo retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PromoModel'
+
+      security:
+        - bearerAuth: []
+
+    put:
+      tags:
+        - Promo
+      operationId: put-update-promo
+      summary: Update Promo Details
+      description: Updates details of a specific promo.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the promo to update.
+      requestBody:
+        $ref: '#/components/requestBodies/createPromo'
+      responses:
+        '200':
+          description: Promo updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+
+      security:
+        - bearerAuth: []
+
+    delete:
+      tags:
+        - Promo
+      operationId: delete-remove-promo
+      summary: Delete Promo
+      description: Deletes a specific promo.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the promo to delete.
+      responses:
+        '200':
+          description: Successful promo deletion
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        example: null
+
+      security:
+        - bearerAuth: []
+
+  /payment/checkout:
+    post:
+      tags:
+        - Payment
+      operationId: post-payment-checkout
+      summary: Payment Checkout
+      description: Payment Checkout
+      requestBody:
+        $ref: '#/components/requestBodies/createCheckout'
+      responses:
+        '201':
+          description: Payment Checkout successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                            example: 'tok_visa'
+                          message:
+                            type: string
+                            example: 'Checkout success'
+                          orderId:
+                            type: integer
+                            example: 1211721892
+
+      security:
+        - bearerAuth: []
+
+  /payment/notification:
+    post:
+      tags:
+        - Payment
+      operationId: post-payment-notification
+      summary: Payment Notification
+      description: Payment Notification
+      requestBody:
+        $ref: '#/components/requestBodies/createNotificationPayment'
+      responses:
+        '201':
+          description: Payment Notification successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /transactions:
+    get:
+      tags:
+        - Transaction
+      operationId: get-fetch-all-transaction
+      summary: Get all Transaction
+      description: Retrieves a list of all registered transaction.
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+          required: false
+          description: Page number for pagination.
+        - in: query
+          name: limit
+          schema:
+            type: integer
+          required: false
+          description: Number of items per page.
+
+      responses:
+        '200':
+          description: Courses retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /transactions/me:
+    get:
+      tags:
+        - Transaction
+      operationId: get-fetch-all-transaction-me
+      summary: Get all Transaction
+      description: Retrieves a list of all registered transaction.
+
+      responses:
+        '200':
+          description: Transaction retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /transactions/{id}:
+    get:
+      tags:
+        - Transaction
+      operationId: get-detail-transaction
+      summary: Get Detail Transaction
+      description: Retrieves a list of detail transaction.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Transaction to retrieve.
+      responses:
+        '200':
+          description: Transaction retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /notification:
+    post:
+      tags:
+        - Notification
+      operationId: post-notification
+      summary: Create New Notification
+      description: Create Data Notification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - body
+              properties:
+                title:
+                  type: string
+                  example: 'Promo'
+                body:
+                  type: string
+                  example: 'Gunakan kode promo HARIPAHLAWAN untuk mendapatkan diskon 30% untuk semua kursus'
+                description:
+                  type: string
+                  example: 'syarat dan ketentuan berlaku'
+      responses:
+        '201':
+          description: Notification created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+    get:
+      tags:
+        - Notification
+      operationId: get-fetch-all-notification
+      summary: Get all Notification
+      description: Retrieves a list of all registered notification.
+
+      responses:
+        '200':
+          description: Notification retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /notification/all:
+    get:
+      tags:
+        - Notification
+      operationId: get-fetch-all-notification-admin
+      summary: Get all Notification Admin Only
+      description: Retrieves a list of all registered notification.
+
+      responses:
+        '200':
+          description: Notification retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /notification/{id}:
+    delete:
+      tags:
+        - Notification
+      operationId: delete-remove-notification
+      summary: Delete Notification Admin Only
+      description: Deletes a specific notification.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the notification to delete.
+      responses:
+        '200':
+          description: Successful notification deletion
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
+
+  /cron:
+    get:
+      tags:
+        - Cron Job
+      operationId: get-cron-job
+      summary: Cron Job
+      description: This endpoint will be automatically executed every 3 day at 00:00 WIB, you should can't call this endpoint manually.
+      responses:
+        '200':
+          description: This endpoint will be automatically executed every 3 day at 00:00 WIB, you should can't call this endpoint manually.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  
+                  
+  /ratings:
+    post:
+      tags:
+        - Ratings
+      operationId: get-post-ratings
+      summary: Users Create Rating Course
+      description: Create data rating.
+      requestBody:
+        $ref: '#/components/requestBodies/createRatings'
+      responses:
+        '201':
+          description: Rating created successfully!.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+                    
+      security:
+        - bearerAuth: []
+        
+  '/ratings/{id}':
+    get:
+      tags:
+        - Ratings
+      operationId: get-ratings
+      summary: Get Data Rating Course
+      description: Get data rating course.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the Course to retrieve.
+      responses:
+        '200':
+          description: Rating retrieved successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+                  - type: object
+
+        
+
+components:
+  securitySchemes:
+    bearerAuth: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    BasicResponse:
+      title: BasicResponse
+      type: object
+      properties:
+        status:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: 'OK'
+
+    RegisterModel:
+      title: Register
+      type: object
+      properties:
+        nickname:
+          type: string
+          example: 'test01'
+        email:
+          type: string
+          example: 'test_dev@gmail.com'
+        phone_number:
+          type: string
+          example: 0898829918291
+        password:
+          type: string
+          example: 'test123'
+
+    VerifyOtpModel:
+      title: verifyOTP
+      type: object
+      properties:
+        null:
+          type: string
+          example:
+
+    LoginUserModel:
+      title: Login Users
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nickname:
+          type: string
+          example: 'usertest02'
+        email:
+          type: string
+          example: 'usertest03@gmail.com'
+        otp:
+          type: string
+          example: 'null'
+        isVerified:
+          type: string
+          example: 'true'
+
+    WhoamiModel:
+      title: Whoami Users & Admin
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nickname:
+          type: string
+          example: 'usertest02'
+        email:
+          type: string
+          example: 'usertest03@gmail.com'
+        iat:
+          type: integer
+          example: 1700840557
+        exp:
+          type: integer
+          example: 1700926957
+
+    LoginAdminModel:
+      title: Login Admin
+      type: object
+      properties:
+        data:
+          type: string
+          example: 'yJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWJAZ21haWwuY29tIiwiaWF0IjoxNzAwODQxNjUyLCJleHAiOjE3MDA5MjgwNTJ9.Xj7FsT6aPtXTZISozyYp8oKABQ8eyLSh0JJBeD2g'
+
+    UsersModel:
+      title: Users
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nickname:
+          type: string
+          example: 'test'
+        email:
+          type: string
+          example: 'test_dev@gmail.com'
+        password:
+          type: string
+          example: '*********'
+
+    AdminModel:
+      title: Admin
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        idAdmin:
+          type: string
+          example: 'admin-course-hub'
+        password:
+          type: string
+          example: '*********'
+
+    ForgotPasswordModel:
+      title: Forgot Password
+      type: object
+      properties:
+        email:
+          type: string
+          example: 'usertest01@gmail.com'
+
+    ResetPasswordModel:
+      title: Reset Password
+      type: object
+      properties:
+        password:
+          type: string
+          example: '*********'
+        confirm_password:
+          type: string
+          example: '*********'
+
+    ChangePasswordModel:
+      title: Change Password
+      type: object
+      properties:
+        password:
+          type: string
+          example: '*********'
+        new_password:
+          type: string
+          example: '*********'
+        confirm_password:
+          type: string
+          example: '*********'
+
+    CourseModel:
+      title: Course
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'course beginner 1'
+        description:
+          type: string
+          example: 'beginner 1'
+        image:
+          type: string
+          example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+        requirement:
+          type: string
+          example: 'Requirement 11'
+        level:
+          type: string
+          example: 'beginner'
+        price:
+          type: integer
+          example: 150000
+        ratings:
+          type: string
+          example: '4'
+        author:
+          type: string
+          example: 'CourseHub'
+        category_id:
+          type: integer
+          example: 1
+
+    PromoModel:
+      title: Promo
+      type: object
+      properties:
+        code_promo:
+          type: string
+          example: 'PROMOHARIPAHLAWAN'
+        discount:
+          type: integer
+          example: 30
+        expiresAt:
+          type: string
+          example: '2023-12-05T23:59:59.999Z'
+
+    Pagination:
+      title: Pagination
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            next:
+              type: string
+              example: 'https://domain.com/users?page=3&limit=10'
+            prev:
+              type: string
+              example: 'https://domain.com/users?page=1&limit=10'
+        total_items:
+          type: integer
+          example: 100
+
+  requestBodies:
+    createNotificationPayment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              order_id:
+                type: integer
+                example: 1
+              transaction_status:
+                type: string
+                example: 'settlement'
+    createCheckout:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: integer
+                example: 1
+              promoCode:
+                type: string
+                example: 'HARIPAHLAWAN'
+
+    createRegister:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nickname:
+                type: string
+                example: 'usertest01'
+              email:
+                type: string
+                example: 'usertest01@gmail.com'
+              phone_number:
+                type: string
+                example: '089627188292'
+              password:
+                type: string
+                example: '***********'
+
+    createOtp:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: 'usertest01@gmail.com'
+              otp:
+                type: string
+                example: 'jpK9oX'
+
+    createLoginUsers:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: 'usertest01@gmail.com'
+              password:
+                type: string
+                example: '***********'
+
+    createLoginAdmin:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              idAdmin:
+                type: string
+                example: 'admin-course-hub'
+              password:
+                type: string
+                example: '***********'
+
+    createAdmin:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              idAdmin:
+                type: string
+                example: 'admin-course-hub'
+              password:
+                type: string
+                example: '***********'
+
+    createForgotPassword:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: 'usertest01@gmail.com'
+
+    createResetPassword:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              password:
+                type: string
+                example: '***********'
+              confirm_password:
+                type: string
+                example: '***********'
+
+    createChangePassword:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              old_password:
+                type: string
+                example: '*********'
+              new_password:
+                type: string
+                example: '*********'
+              confirm_password:
+                type: string
+                example: '*********'
+                
+                
+    createRatings:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              courseId:
+                type: integer
+                example: 1
+              ratings:
+                type: integer
+                example: 5
+
+    createToken:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token=:
+                type: string
+                example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6InVzZXJ0ZXN0MDMiLCJlbWFpbCI6ImR0ZWtjaGFubmVsMDJAZ21haWwuY29tIiwiaWF0IjoxNzAxMjI3OTg1LCJleHAiOjE3MDEyMzE1ODV9.eHsIjd04W9GHopVmhbrSE9q9zc3lvMU8FJF_bg8F5LI'
+
+    createCourse:
+      content:
+        # multipart/form-data:
+        #   schema:
+        #     type: object
+
+        #     properties:
+        #       title:
+        #         type: string
+        #         example: 'course beginner 1'
+        #       description:
+        #         type: string
+        #         example: 'Description beginner 1'
+        #       telegram_group:
+        #         type: string
+        #         example: 'https://t.me/joinchat/1'
+        #       price:
+        #         type: integer
+        #         example: 150000
+        #       image:
+        #         type: string
+        #         example: 'Upload File Image'
+        #         format: binary
+        #       level:
+        #         type: string
+        #         example: 'beginner'
+        #       author:
+        #         type: string
+        #         example: 'CourseHub'
+        #       category_id:
+        #         type: integer
+        #         example: 1
+        #       requirements:
+        #         type: array
+        #         items:
+        #           type: string
+        #         example:
+        #           - 'React JS'
+        #           - 'Tailwind css'
+        #           - 'Node JS'
+        #       chapters:
+        #         type: array
+        #         items:
+        #           type: object
+        #           properties:
+        #             name:
+        #               type: string
+        #               example: 'Chapter 1'
+        #             modules:
+        #               type: array
+        #               items:
+        #                 type: object
+        #                 properties:
+        #                   title:
+        #                     type: string
+        #                     example: 'Module 1'
+        #                   duration:
+        #                     type: integer
+        #                     example: 60
+        #                   url:
+        #                     type: string
+        #                     format: uri
+        #                     example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+
+        application/json:
+          schema:
+            type: object
+            required:
+              - title
+              - description
+              - price
+              - author
+              - level
+              - category_id
+              - requirements
+              - chapters
+
+            properties:
+              title:
+                type: string
+                example: 'course beginner 1'
+              description:
+                type: string
+                example: 'Description beginner 1'
+              telegram_group:
+                type: string
+                example: 'https://t.me/joinchat/1'
+              price:
+                type: integer
+                example: 150000
+              author:
+                type: string
+                example: 'CourseHub'
+              level:
+                type: string
+                example: 'beginner'
+              category_id:
+                type: integer
+                example: '1'
+              requirements:
+                type: array
+                items:
+                  type: string
+                example:
+                  - 'React JS'
+                  - 'Tailwind css'
+                  - 'Node JS'
+              chapters:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: 'Chapter 1'
+                    modules:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            example: 'Module 1'
+                          duration:
+                            type: integer
+                            example: 60
+                          url:
+                            type: string
+                            format: uri
+                            example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+                          isTrailer:
+                            type: boolean
+                            example: true
+
+    updateCourse:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+                example: 'course beginner 1'
+              description:
+                type: string
+                example: 'Description beginner 1'
+              price:
+                type: integer
+                example: 150000
+              image:
+                type: string
+                example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+              requirements:
+                type: array
+                items:
+                  type: string
+                example:
+                  - 'React Dasar'
+                  - 'Express'
+              author:
+                type: string
+                example: 'CourseHub'
+              level:
+                type: string
+                example: 'beginner'
+              chapters:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: 'Chapter 1'
+                    modules:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          title:
+                            type: string
+                            example: 'Module 1'
+                          duration:
+                            type: integer
+                            example: 60
+                          url:
+                            type: string
+                            format: uri
+                            example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+
+    createPromo:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code_promo:
+                type: string
+                example: 'PROMOHARIPAHLAWAN'
+              discount:
+                type: integer
+                example: 30
+              expiresAt:
+                type: string
+                example: '2023-12-05T23:59:59.999Z'
+
+    updateProfile:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              phone_number:
+                type: string
+                example: '62829932992'
+              full_name:
+                type: string
+                example: 'Muhammad Taufik Hidayat 21.11.4316'
+              profile_image:
+                type: string
+                example: 'Upload File Image'
+              city:
+                type: string
+                example: 'Jawa Tengah'
+              country:
+                type: string
+                example: 'Indonesia'

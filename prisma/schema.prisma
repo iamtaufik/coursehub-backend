@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // directUrl = env("DIRECT_URL")
+}
+
+enum Levels {
+  beginner
+  intermediate
+  advanced
+}
+
+model Admin {
+  id        Int      @id @default(autoincrement())
+  idAdmin   String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// model users
+model Users {
+  id                 Int                  @id @default(autoincrement())
+  nickname           String
+  email              String               @unique
+  password           String?
+  otp                String?
+  googleId           String?
+  courses            Courses[]            @relation("UserToCourse")
+  transactions       Transactions[]
+  profile            Profiles?
+  notifications      Notification[]
+  userCourseProgress UserCourseProgress[]
+  ratings            CourseRatings[]
+  isVerified         Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+// model profiles
+model Profiles {
+  id              Int     @id @default(autoincrement())
+  users_id        Int     @unique
+  phone_number    String?
+  full_name       String?
+  profile_picture String?
+  city            String?
+  country         String?
+  users           Users   @relation(fields: [users_id], references: [id])
+}
+
+// model Categories
+model Categories {
+  id              Int       @id @default(autoincrement())
+  name_categories String
+  courses         Courses[]
+}
+
+// model Courses
+model Courses {
+  id             Int             @id @default(autoincrement())
+  title          String
+  description    String
+  image          String?
+  telegram_group String?
+  requirements   String[]
+  level          Levels          @default(beginner)
+  price          Int
+  author         String
+  ratings        CourseRatings[]
+  chapters       Chapters[]
+  transactions   Transactions[]
+  category_id    Int
+  category       Categories      @relation(fields: [category_id], references: [id])
+  users          Users[]         @relation("UserToCourse")
+  isDeleted      Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Chapters {
+  id        Int       @id @default(autoincrement())
+  name      String
+  course_id Int
+  courses   Courses   @relation(fields: [course_id], references: [id])
+  modules   Modules[]
+}
+
+model Modules {
+  id                 Int                  @id @default(autoincrement())
+  title              String
+  duration           Int
+  url                String
+  chapter_id         Int
+  isTrailer          Boolean              @default(false)
+  chapters           Chapters             @relation(fields: [chapter_id], references: [id])
+  userCourseProgress UserCourseProgress[]
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+}
+
+model UserCourseProgress {
+  id          Int     @id @default(autoincrement())
+  userId      Int
+  moduleId    Int
+  isCompleted Boolean @default(false)
+
+  user   Users   @relation(fields: [userId], references: [id])
+  module Modules @relation(fields: [moduleId], references: [id])
+}
+
+model Transactions {
+  id               Int       @id @default(autoincrement())
+  orderId          Int       @unique
+  userId           Int
+  courseId         Int
+  total_price      Int
+  discount         Int       @default(0)
+  status           String
+  promo            Promo?    @relation(fields: [promoId], references: [id])
+  promoId          Int?
+  payment_type     String?
+  transaction_time DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user   Users   @relation(fields: [userId], references: [id])
+  course Courses @relation(fields: [courseId], references: [id])
+}
+
+model Promo {
+  id           Int            @id @default(autoincrement())
+  code_promo   String         @unique
+  discount     Int
+  expiresAt    DateTime
+  transactions Transactions[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+// user spesifik
+model Notification {
+  id             Int      @id @default(autoincrement())
+  notificationId Int
+  userId         Int
+  user           Users    @relation(fields: [userId], references: [id])
+  title          String
+  body           String
+  description    String?
+  isDeleted      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// course ratings
+model CourseRatings {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  ratings   Float
+  course    Courses  @relation(fields: [courseId], references: [id])
+  userId    Int
+  user      Users    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([courseId, userId])
+}

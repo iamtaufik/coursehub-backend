@@ -1,0 +1,259 @@
+### register
+POST http://localhost:3000/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "nickname":"userr",
+  "email":"cefixi7361@aseall.com",
+  "phone_number":"0829932992",
+  "password":"user123"
+}
+
+### OTP
+POST http://localhost:3000/api/v1/auth/verifyOTP
+Content-Type: application/json
+
+{
+  "email":"bomom90298@anawalls.com",
+  "otp": "TRCtRI"
+}
+
+
+### Login
+POST http://localhost:3000/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email":"bomom90298@anawalls.com",
+  "password":"user123"
+}
+
+### Login
+POST http://localhost:3000/api/v1/auth/admin/login
+Content-Type: application/json
+
+{
+  "idAdmin":"admin-course-hub",
+  "password":"admin123"
+}
+
+### forgot password
+POST http://localhost:3000/api/v1/auth/forgotPassword
+Content-Type: application/json
+
+{
+    "email": "dtekchannel02@gmail.com"
+}
+
+### reset password
+POST http://localhost:3000/api/v1/auth/reset-password?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6InVzZXJ0ZXN0MDMiLCJlbWFpbCI6ImR0ZWtjaGFubmVsMDJAZ21haWwuY29tIiwiaWF0IjoxNzAxMDk0NDI5LCJleHAiOjE3MDEwOTgwMjl9.-lqAyLC5zzJo__XuvrlIl2zoQidD9gq_F52zz_JKrkc
+Content-Type: application/json
+
+{
+  "password":"user12345",
+  "confirm_password":"user12345"
+}
+
+### Whoami
+GET http://localhost:3000/api/v1/auth/whoami
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDEyMzI4MzAsImV4cCI6MTcwMTMxOTIzMH0.IC-DZjXAhQm-RoRVzkHlb8K3sm4TS3TsasQL65HtPK0
+
+### Login admin
+POST http://localhost:3000/api/v1/auth/admin/login
+Content-Type: application/json
+
+{
+  "idAdmin":"admin-course-hub",
+  "password":"admin123"
+}
+
+
+### change password
+PUT http://localhost:3000/api/v1/auth/change-password
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MjMsIm5pY2tuYW1lIjoiY2hwdHciLCJlbWFpbCI6ImNhcGV4ODAxNTNAZ2V0bW9sYS5jb20iLCJpYXQiOjE3MDE3OTIwODAsImV4cCI6MTcwMTg3ODQ4MH0.ir8vahG_IL1s1v1CG7g5fnRFANKcId11WmopI3yHQrA
+Content-Type: application/json
+
+{
+  "password":"user123456",
+  "new_password":"user1234",
+  "confirm_password":"user1234"
+}
+
+###
+POST http://localhost:3000/api/v1/courses
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0MzQzNzgsImV4cCI6MTcwMTUyMDc3OH0.K9oXu3Cz9JqyzZe8u-sBHb3UEpKCAwUQjy73rrCBxyU
+
+{
+  "title": "NEXTJS lvl 1",
+  "description": "Belajar NEXTJS paling gampang",
+  "image": " ",
+  "price": 999999,
+  "author": "CourseHub",
+  "level": "beginner",
+  "category_id": 2,
+  "requirements":  [
+          "React Dasar",
+          "Express"
+        ],
+  "chapters": [
+    {
+      "name": "Chapter selanjutnya",
+      "modules": [
+        {
+          "title": "Module 1",
+          "duration": 60,
+          "url": "https://youtu.be/kWT1uGvhWp8?feature=shared"
+        },
+        {
+          "title": "Module 2",
+          "duration": 45,
+          "url": "https://youtu.be/kWT1uGvhWp8?feature=shared"
+        }
+      ]
+    }
+  ]
+}
+
+###
+GET http://localhost:3000/api/v1/courses?levels=beginner
+Content-Type: application/json
+
+###
+GET http://localhost:3000/api/v1/courses
+Content-Type: application/json
+
+###
+GET http://localhost:3000/api/v1/courses?levels=beginner&page=2&pageSize=10
+Content-Type: application/json
+
+### get all course
+GET http://localhost:3000/api/v1/courses
+Content-Type: application/json
+
+### get course with pagination
+GET http://localhost:3000/api/v1/courses?page1&limit=10
+Content-Type: application/json
+
+
+### get detail courses
+GET http://localhost:3000/api/v1/courses/1
+Content-Type: application/json
+
+###
+GET http://localhost:3000/api/v1/courses
+Content-Type: application/json
+
+
+###
+PUT http://localhost:3000/api/v1/courses/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE0Mzc1NzksImV4cCI6MTcwMTUyMzk3OX0.Ldai3wCTko_E80jUK5InUYbWQq5vdcc-nadUbGv4w1Y
+
+{
+  "title": "NEXTJS lvl 1 ",
+  "description": "updated",
+  "price": 100,
+  "image": "https://google.com",
+  "requirements": [
+        "React Dasar",
+        "Express"
+      ],
+  "author": "coursehubh",
+  "level": "intermediate",
+  "chapters": [
+    {
+      "name": "Chapter 1",
+      "modules": [
+        {
+          "title": "Module 1",
+          "duration": 10,
+          "url": "https://google.com"
+        },
+        {
+          "title": "Module 2",
+          "duration": 15,
+          "url": "https://google.com"
+        }
+      ]
+    },
+    {
+      "name": "Chapter 2",
+      "modules": [
+        {
+          "title": "Module 3",
+          "duration": 20,
+          "url": "https://google.com"
+        }
+      ]
+    }
+  ]
+}
+
+
+#### countActiveUsers
+GET http://localhost:3000/api/v1/activeUsers/
+Content-Type: application/json
+
+#### countActiveClass
+GET http://localhost:3000/api/v1/activeClass/
+Content-Type: application/json
+
+#### countPremiumClass
+GET http://localhost:3000/api/v1/premiumClass/
+Content-Type: application/json
+
+#### getRatings
+GET http://localhost:3000/api/v1/ratings/1
+Content-Type: application/json
+
+
+
+#### create promo
+POST http://localhost:3000/api/v1/promo/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE4NDU1MzMsImV4cCI6MTcwMTkzMTkzM30.d0vBRbcisw2cf6-lFgHK4MGqWwpf4DjuUGk5i3pm8pw
+
+{
+  "code_promo": "PROMOHARIPAHLAWAN",
+  "discount": 30,
+  "expiresAt": "2023-12-05T23:59:59.999Z"
+}
+
+
+#### get promo
+GET http://localhost:3000/api/v1/promo/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmlja25hbWUiOiJ1c2VydGVzdDAxIiwiZW1haWwiOiJkdGVrY2hhbm5lbDAyQGdtYWlsLmNvbSIsImlhdCI6MTcwMTgzMjA1MCwiZXhwIjoxNzAxOTE4NDUwfQ.XfNPJ7ke-UapV-aSzPqgpOrXbZJeuS2OUt95s2PXc_I
+
+#### get detail promo
+GET http://localhost:3000/api/v1/promo/2
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmlja25hbWUiOiJ1c2VydGVzdDAxIiwiZW1haWwiOiJkdGVrY2hhbm5lbDAyQGdtYWlsLmNvbSIsImlhdCI6MTcwMTgzMjA1MCwiZXhwIjoxNzAxOTE4NDUwfQ.XfNPJ7ke-UapV-aSzPqgpOrXbZJeuS2OUt95s2PXc_I
+
+#### update promo
+PUT http://localhost:3000/api/v1/promo/5
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE4NDU1MzMsImV4cCI6MTcwMTkzMTkzM30.d0vBRbcisw2cf6-lFgHK4MGqWwpf4DjuUGk5i3pm8pw
+
+{
+  "code_promo": "PROMOKEMERDEKAAN",
+  "discount": 40,
+  "expiresAt": "2023-12-05T23:59:59.999Z"
+}
+
+#### delete promo
+DELETE http://localhost:3000/api/v1/promo/3
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWRBZG1pbiI6ImFkbWluLWNvdXJzZS1odWIiLCJpYXQiOjE3MDE4NDU1MzMsImV4cCI6MTcwMTkzMTkzM30.d0vBRbcisw2cf6-lFgHK4MGqWwpf4DjuUGk5i3pm8pw
+
+#### checkout
+POST http://localhost:3000/api/v1/payment/checkout/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwibmlja25hbWUiOiJ1c2VydGVzdDAxIiwiZW1haWwiOiJkdGVrY2hhbm5lbDAyQGdtYWlsLmNvbSIsImlhdCI6MTcwMTgzMjA1MCwiZXhwIjoxNzAxOTE4NDUwfQ.XfNPJ7ke-UapV-aSzPqgpOrXbZJeuS2OUt95s2PXc_I
+
+{
+  "userId": 1,
+  "courseId": 3,
+  "promoId": 2
+}
