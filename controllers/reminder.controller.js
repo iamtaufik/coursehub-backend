@@ -83,7 +83,7 @@ const createReminder = async (req, res, next) => {
           userId: user.userId,
           title: 'Reminder',
           notificationId,
-          body: `Hai jangan lupa melanjutkan kelas ${user.courses} ya.`,
+          body: `Hai ${user.name}, jangan lewatkan kesempatan untuk mengejar mimpimu dalam kursus ${user.courses} yang sedang kamu ikuti. \n\nIngatlah, keberanian untuk terus belajar adalah kunci menuju kesuksesan. Setiap langkahmu membawa kesempatan baru dan pengetahuan lebih mendalam.\n\nJangan berhenti saat ini saja. Seperti kata pepatah, "Semakin tinggi kamu memanjat, semakin luas pandanganmu." Lanjutkan perjalananmu, dan siapkan dirimu untuk menghadapi tantangan baru.\n\nSalam Sukses,\nTim CourseHub`,
         })),
       }),
     ]);
