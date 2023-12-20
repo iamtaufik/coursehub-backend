@@ -164,7 +164,7 @@ const register = async (req, res, next) => {
 
     const otp = await otpHandler.generateOTP(email);
     const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
-    await nodemailer.sendEmail(email, 'Account Activation OTP', html);
+    nodemailer.sendEmail(email, 'Account Activation OTP', html);
 
     return res.status(201).json({
       status: true,
@@ -408,7 +408,7 @@ const forgotPassword = async (req, res, next) => {
       <p>You have requested to reset your password.</p>
       <p>Please click on the link below to reset your password:</p>
       <a href="${url}">${url}</a>`;
-      await nodemailer.sendEmail(email, 'Reset Password Request', html);
+      nodemailer.sendEmail(email, 'Reset Password Request', html);
 
       return res.json({
         status: true,
@@ -590,7 +590,7 @@ const resendOTP = async (req, res, next) => {
 
     const otp = await otpHandler.generateOTP(email);
     const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
-    await nodemailer.sendEmail(email, 'Account Activation OTP', html);
+    nodemailer.sendEmail(email, 'Account Activation OTP', html);
 
     return res.json({
       status: true,
