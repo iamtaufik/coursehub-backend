@@ -93,9 +93,8 @@ const myTransaction = async (req, res, next) => {
       },
       include: {
         course: {
-          select: {
-            id: true,
-            title: true,
+          include: {
+            ratings: true,
           },
         },
       },
@@ -104,10 +103,31 @@ const myTransaction = async (req, res, next) => {
       },
     });
 
+    const calculateAverageRating = (ratings) => {
+      if (ratings && ratings.length > 0) {
+        const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
+        const totalUsers = ratings.length;
+        return totalRatings / totalUsers;
+      } else {
+        return 0;
+      }
+    };
+
+    const newTransactions = transactions.map((transaction) => {
+      const averageRating = calculateAverageRating(transaction.course.ratings);
+      return {
+        ...transaction,
+        course: {
+          ...transaction.course,
+          averageRating,
+        },
+      };
+    });
+
     res.status(200).json({
       success: true,
       message: 'Successfully get transactions',
-      data: [...transactions],
+      data: [...newTransactions],
     });
   } catch (error) {
     next(error);
