@@ -54,12 +54,17 @@ const createReminder = async (req, res, next) => {
       },
       select: {
         email: true,
+        courses: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
 
     Promise.all(
       usersEmail.map((user) => {
-        return new Promise((resolve, reject) => {
+        user.courses.forEach((course) => {
           const mailOptions = {
             from: 'Admin <' + process.env.EMAIL_USER + '>',
             to: user.email,
