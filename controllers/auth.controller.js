@@ -6,6 +6,10 @@ const otpHandler = require('../libs/otpHandler');
 const nodemailer = require('../libs/nodemailer');
 const { registerUserSchema, createAdminSchema, forgotPasswordSchema, loginAdminSchema, loginUserSchema, verifyOTPSchema, resetPasswordSchema, changePasswordSchema } = require('../validations/auth.validation');
 const axios = require('axios');
+const { emailOtpVerify } = require('../libs/template-email/emailOtpVerify');
+const { emailResetPassword } = require('../libs/template-email/emailResetPassword');
+
+
 // login user
 const loginUser = async (req, res, next) => {
   try {
@@ -163,8 +167,8 @@ const register = async (req, res, next) => {
     );
 
     const otp = await otpHandler.generateOTP(email);
-    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
-    await nodemailer.sendEmail(email, 'Account Activation OTP', html);
+    // const html = emailOtpVerify(otp, token);
+    await nodemailer.sendEmail(email, 'Account Activation OTP', emailOtpVerify(otp, token));
 
     return res.status(201).json({
       status: true,
@@ -178,6 +182,7 @@ const register = async (req, res, next) => {
     next(err);
   }
 };
+
 
 const loginAdmin = async (req, res, next) => {
   try {
@@ -402,13 +407,8 @@ const forgotPassword = async (req, res, next) => {
         process.env.JWT_SECRET,
         { expiresIn: '1h' }
       );
-      let url = `http://localhost:3000/api/v1/auth/reset-password?token=${token}`;
 
-      let html = `<p>Hi ${user.nickname},</p>
-      <p>You have requested to reset your password.</p>
-      <p>Please click on the link below to reset your password:</p>
-      <a href="${url}">${url}</a>`;
-      await nodemailer.sendEmail(email, 'Reset Password Request', html);
+      await nodemailer.sendEmail(email, 'Reset Password Request', emailResetPassword(token, user));
 
       return res.json({
         status: true,
@@ -589,8 +589,7 @@ const resendOTP = async (req, res, next) => {
     );
 
     const otp = await otpHandler.generateOTP(email);
-    const html = `<a href="http://localhost:3000/verify-otp/?otp=${otp}&token=${token}">Klik disini untuk aktifasi akun</a>`;
-    await nodemailer.sendEmail(email, 'Account Activation OTP', html);
+    await nodemailer.sendEmail(email, 'Account Activation OTP', emailOtpVerify(otp, token));
 
     return res.json({
       status: true,

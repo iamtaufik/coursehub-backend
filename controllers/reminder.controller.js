@@ -1,5 +1,6 @@
 const prisma = require('../libs/prisma');
 const { sendEmail } = require('../libs/nodemailer');
+const { emailReminder } = require('../libs/template-email/emailReminder');
 
 const createReminder = async (req, res, next) => {
   try {
@@ -67,11 +68,16 @@ const createReminder = async (req, res, next) => {
           const mailOptions = {
             from: 'Admin <' + process.env.EMAIL_USER + '>',
             to: user.email,
-            subject: 'Reminder',
-            text: `Hai jangan lupa melanjutkan kelas ${course.title} ya.`,
+            subject: 'Yuk, Lanjutkan Kelasmu!',
           };
 
-          sendEmail(mailOptions.to, mailOptions.subject, mailOptions.text);
+          sendEmail(mailOptions.to, mailOptions.subject, mailOptions.emailReminder(user))
+            .then(() => {
+              resolve(true);
+            })
+            .catch((error) => {
+              reject(error);
+            });
         });
       })
     );
@@ -82,7 +88,7 @@ const createReminder = async (req, res, next) => {
           userId: user.userId,
           title: 'Reminder',
           notificationId,
-          body: `Hai jangan lupa melanjutkan kelas ${user.courses} ya.`,
+          body: emailReminder(user),
         })),
       }),
     ]);
@@ -96,7 +102,6 @@ const createReminder = async (req, res, next) => {
     next(error);
   }
 };
-
 module.exports = {
   createReminder,
 };
