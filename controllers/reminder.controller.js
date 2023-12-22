@@ -54,25 +54,25 @@ const createReminder = async (req, res, next) => {
       },
       select: {
         email: true,
+        courses: {
+          select: {
+            title: true,
+          },
+        },
       },
     });
 
     Promise.all(
       usersEmail.map((user) => {
-        return new Promise((resolve, reject) => {
+        user.courses.forEach((course) => {
           const mailOptions = {
             from: 'Admin <' + process.env.EMAIL_USER + '>',
             to: user.email,
-            subject: 'Yuk, Lanjutkan Kelasmu!',
+            subject: 'Reminder',
+            text: `Hai jangan lupa melanjutkan kelas ${course.title} ya.`,
           };
 
-          sendEmail(mailOptions.to, mailOptions.subject, mailOptions.emailReminder(user))
-            .then(() => {
-              resolve(true);
-            })
-            .catch((error) => {
-              reject(error);
-            });
+          sendEmail(mailOptions.to, mailOptions.subject, mailOptions.text);
         });
       })
     );

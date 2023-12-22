@@ -17,34 +17,58 @@ const getCategories = async (req, res, next) => {
 
 const getCourseByCategory = async (req, res, next) => {
   try {
-    await getCategoriesSchema.validateAsync({...req.params});
-    const id = parseInt(req.params.id);
-
+    await getCategoriesSchema.validateAsync({ ...req.params });
+    const categoryId = parseInt(req.params.id);
     const category = await prisma.categories.findUnique({
-      where: { id: Number(id) },
+      where: { id: categoryId },
       include: {
-        courses: true,
+        courses: {
+          where: {
+            isDeleted: false,
+          },
+        },
       },
     });
 
     if (!category) {
       return res.status(404).json({
-        message: 'Course category not found!'
+        message: 'Kategori kursus tidak ditemukan!',
       });
     }
 
     if (category.courses.length === 0) {
       res.status(200).json({
         status: true,
-        message: 'Course data does not exist in the category ' + category.name_categories,
+        message: 'Data kursus tidak ada dalam kategori ' + category.name_categories,
         data: category.courses,
       });
     }
 
+    const courseId = category.courses[0].id;
+    const ratings = await prisma.courseRatings.findMany({
+      where: {
+        courseId: courseId,
+      },
+    });
+
+    const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
+    const totalUsers = ratings.length;
+    const averageRatings = totalUsers > 0 ? totalRatings / totalUsers : 0;
+
     res.status(200).json({
       status: true,
-      message: category.name_categories,
-      data: category.courses,
+      message: `Detail Kategori dan Peringkat Kursus`,
+      data: {
+        category: {
+          name: category.name_categories,
+          courses: category.courses,
+          ratings: {
+            totalRatings: totalRatings,
+            totalUsers: totalUsers,
+            averageRatings: averageRatings,
+          },
+        },
+      },
     });
   } catch (error) {
     next(error);
