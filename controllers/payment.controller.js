@@ -138,9 +138,25 @@ const notification = async (req, res, next) => {
             transaction_time: new Date(transaction_time),
           },
           include: {
-            course: true,
+            course: {
+              include: {
+                chapters: {
+                  include: {
+                    modules: true,
+                  },
+                },
+              },
+            },
           },
         });
+
+        const temp = transaction.course.chapters.map((chapter) =>
+          chapter.modules.map((module) => ({
+            userId: Number(transaction.userId),
+            moduleId: Number(module.id),
+            isCompleted: false,
+          }))
+        );
 
         await prisma.$transaction([
           // set course to user
@@ -155,6 +171,9 @@ const notification = async (req, res, next) => {
                 },
               },
             },
+          }),
+          prisma.userCourseProgress.createMany({
+            data: temp.flat(),
           }),
           prisma.notification.create({
             data: {

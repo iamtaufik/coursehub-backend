@@ -25,7 +25,7 @@ const getTransactions = async (req, res, next) => {
           },
           user: {
             select: {
-              name: true,
+              nickname: true,
               email: true,
             },
           },
@@ -66,7 +66,7 @@ const getTransactions = async (req, res, next) => {
         },
         user: {
           select: {
-            name: true,
+            nickname: true,
             email: true,
           },
         },
