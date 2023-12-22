@@ -517,6 +517,7 @@ const myCourse = async (req, res, next) => {
   try {
     const { email } = req.user;
 
+    // Mendapatkan data kursus pengguna
     let { courses } = await prisma.users.findUnique({
       where: {
         email,
@@ -530,10 +531,34 @@ const myCourse = async (req, res, next) => {
       },
     });
 
+    const courseId = courses[0].id;
+
+    const ratings = await prisma.courseRatings.findMany({
+      where: {
+        courseId: courseId,
+      },
+    });
+
+    const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
+    const totalUsers = ratings.length;
+
+    const averageRatings = totalUsers > 0 ? totalRatings / totalUsers : 0;
+
+    const coursesWithRating = courses.map(course => ({
+      ...course,
+      ratings: {
+        totalRatings: totalRatings,
+        totalUsers: totalUsers,
+        averageRatings: averageRatings,
+      },
+    }));
+
     res.status(200).json({
       status: true,
-      message: 'Courses retrieved successfully',
-      data: [...courses],
+      message: `Courses retrieved successfully`,
+      data: {
+        userCourses: coursesWithRating,
+      },
     });
   } catch (error) {
     next(error);
@@ -630,10 +655,29 @@ const getDetailMyCourse = async (req, res, next) => {
       })),
     }));
 
+    const courseId = courses[0].id;
+    const ratings = await prisma.courseRatings.findMany({
+      where: {
+        courseId: courseId,
+      },
+    });
+    const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
+    const totalUsers = ratings.length;
+    const averageRatings = totalUsers > 0 ? totalRatings / totalUsers : 0;
+
+    const courseWithRating = {
+      ...courses[0],
+      ratings: {
+        totalRatings: totalRatings,
+        totalUsers: totalUsers,
+        averageRatings: averageRatings,
+      },
+    };
+
     res.status(200).json({
       status: true,
-      message: 'Detail Courses!',
-      data: { ...courses[0] },
+      message: 'Detail Kursus!',
+      data: courseWithRating,
     });
   } catch (error) {
     next(error);
