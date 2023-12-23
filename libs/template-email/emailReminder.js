@@ -1,5 +1,5 @@
 module.exports = {
-  emailReminder: (user) => {
+  emailReminder: (user, courseTitle) => {
     const email = `
     <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -467,13 +467,13 @@ module.exports = {
                       <td align="center" class="es-m-txt-c" style="padding:0;Margin:0;padding-bottom:10px"><h3 style="Margin:0;font-family:arial, 'helvetica neue', helvetica, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:46px;font-style:normal;font-weight:bold;line-height:46px;color:#333333">Reminder</h3></td>
                      </tr>
                      <tr>
-                      <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Hai <strong>${user.name}</strong>,</p></td>
+                      <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Hai <strong>${user.nickname}</strong>,</p></td>
                      </tr>
                      <tr>
-                      <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">jangan lewatkan kesempatan untuk mengejar mimpimu dalam kursus <strong>${user.courses}</strong> yang sedang kamu ikuti. Ingatlah, keberanian untuk terus belajar adalah kunci menuju kesuksesan. Setiap langkahmu membawa kesempatan baru dan pengetahuan lebih mendalam. Jangan berhenti saat ini saja. Seperti kata pepatah, "Semakin tinggi kamu memanjat, semakin luas pandanganmu." Lanjutkan perjalananmu, dan siapkan dirimu untuk menghadapi tantangan baru.</p></td>
+                      <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">jangan lewatkan kesempatan untuk mengejar mimpimu dalam kursus <strong>${courseTitle}</strong> yang sedang kamu ikuti. Ingatlah, keberanian untuk terus belajar adalah kunci menuju kesuksesan. Setiap langkahmu membawa kesempatan baru dan pengetahuan lebih mendalam. Jangan berhenti saat ini saja. Seperti kata pepatah, "Semakin tinggi kamu memanjat, semakin luas pandanganmu." Lanjutkan perjalananmu, dan siapkan dirimu untuk menghadapi tantangan baru.</p></td>
                      </tr>
                      <tr>
-                      <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Terimakasih <strong>${user.name}.</strong></p></td>
+                      <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Terimakasih <strong>${user.nickname}.</strong></p></td>
                      </tr>
                      <tr>
                       <td align="center" class="es-m-p0r es-m-p0l" style="Margin:0;padding-top:5px;padding-right:40px;padding-bottom:5px;padding-left:40px"><p style="Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px">Salam Sukses,Tim CourseHub</p></td>
@@ -552,5 +552,5 @@ module.exports = {
  </body>
 </html>`;
     return email;
-  }
-}
+  },
+};
