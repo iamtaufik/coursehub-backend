@@ -54,6 +54,7 @@ const createReminder = async (req, res, next) => {
       },
       select: {
         email: true,
+        nickname: true,
         courses: {
           select: {
             title: true,
@@ -71,13 +72,7 @@ const createReminder = async (req, res, next) => {
             subject: 'Yuk, Lanjutkan Kelasmu!',
           };
 
-          sendEmail(mailOptions.to, mailOptions.subject, mailOptions.emailReminder(user))
-            .then(() => {
-              resolve(true);
-            })
-            .catch((error) => {
-              reject(error);
-            });
+          sendEmail(mailOptions.to, mailOptions.subject, emailReminder(user, course.title));
         });
       })
     );
