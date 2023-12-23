@@ -399,8 +399,6 @@ const joinCourse = async (req, res, next) => {
     const { id } = req.params;
     const { email } = req.user;
 
-    // await joinCourseSchema.validateAsync({ ...req.params, ...req.body });
-
     const course = await prisma.courses.findUnique({
       where: {
         id: Number(id),
@@ -485,8 +483,6 @@ const joinCourse = async (req, res, next) => {
       }))
     );
 
-    // console.log(temp);
-
     await prisma.$transaction([
       prisma.userCourseProgress.createMany({
         data: temp.flat(),
@@ -517,7 +513,6 @@ const myCourse = async (req, res, next) => {
   try {
     const { email } = req.user;
 
-    // Mendapatkan data kursus pengguna
     let { courses } = await prisma.users.findUnique({
       where: {
         email,
@@ -556,14 +551,13 @@ const myCourse = async (req, res, next) => {
     res.status(200).json({
       status: true,
       message: `Courses retrieved successfully`,
-      data: {
-        userCourses: coursesWithRating,
-      },
+      data: coursesWithRating
     });
   } catch (error) {
     next(error);
   }
 };
+
 
 const getDetailMyCourse = async (req, res, next) => {
   try {
