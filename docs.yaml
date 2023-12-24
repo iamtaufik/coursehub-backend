@@ -1161,6 +1161,30 @@ paths:
         - bearerAuth: []
 
   /notification/{id}:
+    put:
+      tags:
+        - Notification
+      operationId: put-update-notification
+      summary: Update Notification Details
+      description: Updates details of a specific notification.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: The ID of the notification to update.
+      responses:
+        '200':
+          description: Notification updated successfully!
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/BasicResponse'
+
+      security:
+        - bearerAuth: []
     delete:
       tags:
         - Notification
@@ -1201,8 +1225,7 @@ paths:
               schema:
                 allOf:
                   - $ref: '#/components/schemas/BasicResponse'
-                  
-                  
+
   /ratings:
     post:
       tags:
@@ -1221,10 +1244,10 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/BasicResponse'
                   - type: object
-                    
+
       security:
         - bearerAuth: []
-        
+
   '/ratings/{id}':
     get:
       tags:
@@ -1248,8 +1271,6 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/BasicResponse'
                   - type: object
-
-        
 
 components:
   securitySchemes:
@@ -1605,8 +1626,7 @@ components:
               confirm_password:
                 type: string
                 example: '*********'
-                
-                
+
     createRatings:
       content:
         application/json:

@@ -154,6 +154,7 @@ model Notification {
   title          String
   body           String
   description    String?
+  isRead         Boolean  @default(false)
   isDeleted      Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
