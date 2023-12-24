@@ -53,6 +53,7 @@ const createReminder = async (req, res, next) => {
         },
       },
       select: {
+        id: true,
         email: true,
         nickname: true,
         courses: {
@@ -77,13 +78,18 @@ const createReminder = async (req, res, next) => {
       })
     );
 
+    prisma.notification.create({
+      data: {
+        notificationId,
+      },
+    });
     await prisma.$transaction([
       prisma.notification.createMany({
         data: usersToReminder.map((user) => ({
+          notificationId: notificationId,
           userId: user.userId,
           title: 'Reminder',
-          notificationId,
-          body: emailReminder(user),
+          body: `Hai, jangan lupa untuk melanjutkan kelas ${user.courses} ya!`,
         })),
       }),
     ]);
