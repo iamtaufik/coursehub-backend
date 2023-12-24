@@ -210,9 +210,7 @@ const getCourses = async (req, res, next) => {
     return res.status(200).json({
       status: true,
       message: 'Courses retrieved successfully',
-      data: {
-        courses,
-      },
+      data: courses,
     });
   } catch (error) {
     next(error);
