@@ -77,7 +77,6 @@ const createCourse = async (req, res, next) => {
   }
 };
 
-
 const getCourses = async (req, res, next) => {
   try {
     let courses;
@@ -211,7 +210,9 @@ const getCourses = async (req, res, next) => {
     return res.status(200).json({
       status: true,
       message: 'Courses retrieved successfully',
-      data: courses,
+      data: {
+        courses,
+      },
     });
   } catch (error) {
     next(error);
@@ -393,7 +394,6 @@ const getDetailCourses = async (req, res, next) => {
   }
 };
 
-
 const joinCourse = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -539,7 +539,7 @@ const myCourse = async (req, res, next) => {
 
     const averageRatings = totalUsers > 0 ? totalRatings / totalUsers : 0;
 
-    const coursesWithRating = courses.map(course => ({
+    const coursesWithRating = courses.map((course) => ({
       ...course,
       ratings: {
         totalRatings: totalRatings,
@@ -551,13 +551,12 @@ const myCourse = async (req, res, next) => {
     res.status(200).json({
       status: true,
       message: `Courses retrieved successfully`,
-      data: coursesWithRating
+      data: coursesWithRating,
     });
   } catch (error) {
     next(error);
   }
 };
-
 
 const getDetailMyCourse = async (req, res, next) => {
   try {
