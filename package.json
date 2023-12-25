@@ -13,7 +13,7 @@
   "author": "BEJS Group 1",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.6.0",
+    "@prisma/client": "^5.7.1",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
@@ -35,6 +35,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
-    "prisma": "^5.6.0"
+    "prisma": "^5.7.1"
   }
 }

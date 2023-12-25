@@ -78,6 +78,7 @@ model Courses {
   chapters       Chapters[]
   transactions   Transactions[]
   category_id    Int
+  status_rating  Boolean         @default(false)
   category       Categories      @relation(fields: [category_id], references: [id])
   users          Users[]         @relation("UserToCourse")
   isDeleted      Boolean         @default(false)

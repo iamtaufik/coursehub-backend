@@ -524,27 +524,38 @@ const myCourse = async (req, res, next) => {
       },
     });
 
-    const courseId = courses[0].id;
+    const userId = req.user.id;
 
-    const ratings = await prisma.courseRatings.findMany({
+    // Menyimpan semua ratings yang diberikan oleh user pada kursus yang diikuti
+    const userRatings = await prisma.courseRatings.findMany({
       where: {
-        courseId: courseId,
+        userId: userId,
+        courseId: {
+          in: courses.map(course => course.id),
+        },
       },
     });
 
-    const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
-    const totalUsers = ratings.length;
+    const totalRatings = userRatings.reduce((sum, rating) => sum + rating.ratings, 0);
+    const totalUsers = userRatings.length;
 
     const averageRatings = totalUsers > 0 ? totalRatings / totalUsers : 0;
 
-    const coursesWithRating = courses.map((course) => ({
-      ...course,
-      ratings: {
-        totalRatings: totalRatings,
-        totalUsers: totalUsers,
-        averageRatings: averageRatings,
-      },
-    }));
+    // Menambahkan status_rating ke setiap kursus
+    const coursesWithRating = courses.map((course) => {
+      const userRating = userRatings.find((rating) => rating.courseId === course.id);
+      const statusRating = userRating ? true : false;
+
+      return {
+        ...course,
+        ratings: {
+          totalRatings: totalRatings,
+          totalUsers: totalUsers,
+          averageRatings: averageRatings,
+        },
+        status_rating: statusRating, // Menambahkan status_rating ke setiap kursus
+      };
+    });
 
     res.status(200).json({
       status: true,
@@ -555,6 +566,7 @@ const myCourse = async (req, res, next) => {
     next(error);
   }
 };
+
 
 const getDetailMyCourse = async (req, res, next) => {
   try {

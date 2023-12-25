@@ -33,9 +33,25 @@ const createRatings = async (req, res, next) => {
     if (!isUsersEnrolled) {
       return res.status(403).json({
         status: false,
-        message: 'Users have not purchased this course!'
+        message: 'You have not purchased this course!'
       });
     }
+
+    // Cek apakah ada rating dari pengguna sebelumnya
+    const isPreviousRatingGiven = await prisma.courseRatings.findFirst({
+      where: {
+        courseId: courseId,
+      },
+    });
+
+    // Jika tidak ada rating sebelumnya, set status_rating menjadi false
+    const statusRating = isPreviousRatingGiven ? true : false;
+
+    // Update status_rating
+    await prisma.courses.update({
+      where: { id: courseId },
+      data: { status_rating: statusRating },
+    });
 
     const newRatings = await prisma.courseRatings.create({
       data: {
@@ -47,7 +63,7 @@ const createRatings = async (req, res, next) => {
 
     res.status(201).json({
       status: true,
-      message: 'Created Ratings Successfully!',
+      message: 'Created ratings successfully!',
       data: newRatings
     });
 
@@ -56,11 +72,11 @@ const createRatings = async (req, res, next) => {
   }
 };
 
+
 const getRatingCourses = async (req, res, next) => {
   try {
     const courseId = parseInt(req.params.id);
 
-    // Mendapatkan ratings dari database menggunakan Prisma
     const ratings = await prisma.courseRatings.findMany({
       where: {
         courseId: courseId
