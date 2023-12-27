@@ -78,18 +78,20 @@ model Courses {
   chapters       Chapters[]
   transactions   Transactions[]
   category_id    Int
-  category       Categories      @relation(fields: [category_id], references: [id])
+  category       Categories      @relation(fields: [category_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   users          Users[]         @relation("UserToCourse")
   isDeleted      Boolean         @default(false)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+
+  
 }
 
 model Chapters {
   id        Int       @id @default(autoincrement())
   name      String
   course_id Int
-  courses   Courses   @relation(fields: [course_id], references: [id])
+  courses   Courses   @relation(fields: [course_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   modules   Modules[]
 }
 
@@ -100,7 +102,7 @@ model Modules {
   url                String
   chapter_id         Int
   isTrailer          Boolean              @default(false)
-  chapters           Chapters             @relation(fields: [chapter_id], references: [id])
+  chapters           Chapters             @relation(fields: [chapter_id], references: [id], onUpdate: Cascade, onDelete: Cascade)
   userCourseProgress UserCourseProgress[]
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
@@ -113,7 +115,7 @@ model UserCourseProgress {
   isCompleted Boolean @default(false)
 
   user   Users   @relation(fields: [userId], references: [id])
-  module Modules @relation(fields: [moduleId], references: [id])
+  module Modules @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 }
 
 model Transactions {
