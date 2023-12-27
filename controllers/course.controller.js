@@ -228,6 +228,13 @@ const updateCourse = async (req, res, next) => {
         id: course_id,
         AND: { isDeleted: false },
       },
+      include: {
+        chapters: {
+          include: {
+            modules: true,
+          },
+        },
+      },
     });
 
     if (!existingCourse) {
@@ -240,19 +247,6 @@ const updateCourse = async (req, res, next) => {
     }
 
     const { title, description, telegram_group, price, image, chapters, requirements, author, level } = req.body;
-    const existingChapters = await prisma.chapters.findMany({
-      where: {
-        course_id: course_id,
-      },
-    });
-
-    for (const chapter of existingChapters) {
-      await prisma.modules.deleteMany({
-        where: {
-          chapter_id: chapter.id,
-        },
-      });
-    }
 
     const updatedCourse = await prisma.courses.update({
       where: {
@@ -268,18 +262,28 @@ const updateCourse = async (req, res, next) => {
         level,
         requirements: { set: requirements },
         chapters: {
-          deleteMany: { course_id: course_id },
-          create: chapters.map((chapter) => {
+          update: chapters.map((chapter) => {
             return {
-              name: chapter.name,
-              modules: {
-                create: chapter.modules.map((module) => {
-                  return {
-                    title: module.title,
-                    duration: module.duration,
-                    url: module.url,
-                  };
-                }),
+              where: {
+                id: chapter.id,
+              },
+              data: {
+                name: chapter.name,
+                modules: {
+                  update: chapter.modules.map((module) => {
+                    return {
+                      where: {
+                        id: module.id,
+                      },
+                      data: {
+                        title: module.title,
+                        duration: module.duration,
+                        url: module.url,
+                        isTrailer: module.isTrailer,
+                      },
+                    };
+                  }),
+                },
               },
             };
           }),
@@ -349,8 +353,15 @@ const getDetailCourses = async (req, res, next) => {
       where: { id: Number(id), AND: { isDeleted: false } },
       include: {
         chapters: {
+          orderBy: {
+            id: 'asc',
+          },
           include: {
-            modules: true,
+            modules: {
+              orderBy: {
+                id: 'asc',
+              },
+            },
           },
         },
         ratings: true,
@@ -610,8 +621,14 @@ const getDetailMyCourse = async (req, res, next) => {
           },
           include: {
             chapters: {
+              orderBy: {
+                id: 'asc',
+              },
               include: {
                 modules: {
+                  orderBy: {
+                    id: 'asc',
+                  },
                   select: {
                     id: true,
                     title: true,

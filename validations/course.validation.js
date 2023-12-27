@@ -56,12 +56,15 @@ const updateCourseSchema = joi.object({
   title: joi.string().required(),
   description: joi.string().required(),
   telegram_group: joi.string(),
+  isDeleted: joi.boolean().optional(),
   image: joi.string(),
   price: joi.number().required(),
   category_id: joi.number().required(),
   requirements: joi.array().items(joi.string()).required(),
   level: joi.string().valid('beginner', 'intermediate', 'advanced').required(),
   author: joi.string().required(),
+  createdAt: joi.date().optional(),
+  updatedAt: joi.date().optional(),
   chapters: joi
     .array()
     .not()
@@ -70,6 +73,8 @@ const updateCourseSchema = joi.object({
     .message('At least one chapter is required')
     .items(
       joi.object({
+        id: joi.number().optional(),
+        course_id: joi.number().optional(),
         name: joi.string().required(),
         modules: joi
           .array()
@@ -79,9 +84,14 @@ const updateCourseSchema = joi.object({
           .message('At least one module is required')
           .items(
             joi.object({
+              id: joi.number().optional(),
+              chapter_id: joi.number().optional(),
               title: joi.string().required(),
               duration: joi.number().required(),
               url: joi.string().required(),
+              isTrailer: joi.boolean().default(false),
+              createdAt: joi.date().optional(),
+              updatedAt: joi.date().optional(),
             })
           )
           .required(),
