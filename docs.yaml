@@ -1844,6 +1844,9 @@ components:
                             type: string
                             format: uri
                             example: 'https://youtu.be/kWT1uGvhWp8?feature=shared'
+                          isTrailer:
+                            type: boolean
+                            example: true
 
     createPromo:
       content:
