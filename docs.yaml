@@ -1820,6 +1820,9 @@ components:
                 items:
                   type: object
                   properties:
+                    id:
+                      type: integer
+                      example: 1
                     name:
                       type: string
                       example: 'Chapter 1'
@@ -1828,6 +1831,9 @@ components:
                       items:
                         type: object
                         properties:
+                          id: 
+                            type: integer
+                            example: 1
                           title:
                             type: string
                             example: 'Module 1'
