@@ -68,7 +68,7 @@ model Courses {
   id             Int             @id @default(autoincrement())
   title          String
   description    String
-  image          String?
+  image          String
   telegram_group String?
   requirements   String[]
   level          Levels          @default(beginner)
