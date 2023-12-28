@@ -174,6 +174,20 @@ const getCourses = async (req, res, next) => {
         _count: { id: true },
       });
       const pagination = getPagination(req, _count.id, Number(page), Number(limit));
+      const calculateAverageRating = (ratings) => {
+        if (ratings && ratings.length > 0) {
+          const totalRatings = ratings.reduce((sum, rating) => sum + rating.ratings, 0);
+          const totalUsers = ratings.length;
+          return totalRatings / totalUsers;
+        } else {
+          return 0;
+        }
+      };
+
+      courses = courses.map((course) => ({
+        ...course,
+        averageRating: calculateAverageRating(course.ratings),
+      }));
       return res.status(200).json({
         status: true,
         message: 'Courses retrieved successfully',
