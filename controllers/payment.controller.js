@@ -3,7 +3,7 @@ const prisma = require('../libs/prisma');
 const { createPaymentSchema, createNotificationPaymentSchema } = require('../validations/payment.validation');
 
 const snap = new Midtrans.Snap({
-  isProduction: false,
+  isProduction: process.env.VERCEL_ENV === 'production',
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
 });
