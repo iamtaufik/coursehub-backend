@@ -96,14 +96,15 @@ const getCourses = async (req, res, next) => {
           ratings: true,
         },
       });
-    } else if (req.query.category) {
-      const { category } = req.query;
+    } else if (req.query.level && req.query.category) {
+      const { level, category } = req.query;
       courses = await prisma.courses.findMany({
         where: {
           category: {
             name_categories: typeof category === 'string' ? { in: [category] } : { in: [...category] },
           },
           AND: { isDeleted: false },
+          ...(level && { level }),
         },
         include: {
           category: true,
@@ -124,14 +125,15 @@ const getCourses = async (req, res, next) => {
           ratings: true,
         },
       });
-    } else if (req.query.filter) {
-      const { filter } = req.query;
+    } else if (req.query.sort) {
+      console.log(req.query.sort);
+      const { sort } = req.query;
       const filterOptions = {
         populer: { orderBy: { ratings: 'desc' } },
         terbaru: { orderBy: { createdAt: 'desc' } },
       };
       courses = await prisma.courses.findMany({
-        ...filterOptions[filter],
+        ...filterOptions[sort],
         where: {
           isDeleted: false,
         },
@@ -140,19 +142,14 @@ const getCourses = async (req, res, next) => {
           ratings: true,
         },
       });
-    } else if (req.query.level && req.category && req.query.filter) {
-      const { level, category, fillter } = req.query;
-      const filterOptions = {
-        populer: { orderBy: { ratings: 'desc' } },
-        terbaru: { orderBy: { createdAt: 'desc' } },
-      };
+    } else if (req.query.category) {
+      const { category } = req.query;
       courses = await prisma.courses.findMany({
-        ...filterOptions[fillter],
         where: {
           category: {
             name_categories: typeof category === 'string' ? { in: [category] } : { in: [...category] },
           },
-          ...(level && { level }),
+          AND: { isDeleted: false },
         },
         include: {
           category: true,
